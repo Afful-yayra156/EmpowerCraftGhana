@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orders | EmpowerSkills Ghana</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #2196F3, #0D47A1);
+            color: white;
+            text-align: center;
+        }
+        .container {
+            width: 90%;
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            background: white;
+            color: black;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+            margin-top: 50px;
+        }
+        h2 {
+            color: #0D47A1;
+        }
+        .order-list {
+            margin-top: 20px;
+        }
+        .order-item {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            text-align: left;
+        }
+        .order-item button {
+            background-color: #0D47A1;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .nav {
+            display: flex;
+            justify-content: space-around;
+            padding: 10px;
+            background: #0D47A1;
+            border-radius: 5px;
+        }
+        .nav a {
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+            padding: 10px;
+        }
+        .nav a:hover {
+            background: #1976D2;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Order History</h2>
+        <div class="nav">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="services.html">Services</a>
+            <a href="listings.html">Listings</a>
+            <a href="messages.html">Messages</a>
+        </div>
+
+        <div id="orderList" class="order-list"></div>
+    </div>
+
+    <script>
+        let user = JSON.parse(localStorage.getItem("loggedInUser"));
+
+        if (!user) {
+            alert("Please log in first!");
+            window.location.href = "login.php";
+        }
+
+        let orderList = document.getElementById("orderList");
+
+        // Sample orders (Replace with API call)
+        let orders = [
+            { id: 1, item: "Handmade Beaded Necklace", price: "50", status: "Delivered", date: "2025-02-10" },
+            { id: 2, item: "Wooden Carving", price: "200", status: "Processing", date: "2025-02-12" }
+        ];
+
+        function renderOrders() {
+            orderList.innerHTML = "";
+            orders.forEach(order => {
+                let orderItem = document.createElement("div");
+                orderItem.classList.add("order-item");
+                orderItem.innerHTML = `
+                    <h3>${order.item}</h3>
+                    <p><strong>Price:</strong> GHS ${order.price}</p>
+                    <p><strong>Status:</strong> ${order.status}</p>
+                    <p><strong>Date:</strong> ${order.date}</p>
+                    ${order.status === "Processing" ? `<button onclick="cancelOrder(${order.id})">Cancel Order</button>` : ""}
+                `;
+                orderList.appendChild(orderItem);
+            });
+        }
+
+        function cancelOrder(orderId) {
+            let order = orders.find(o => o.id === orderId);
+            if (order && confirm("Are you sure you want to cancel this order?")) {
+                order.status = "Cancelled";
+                renderOrders();
+            }
+        }
+
+        renderOrders();
+    </script>
+
+</body>
+</html>

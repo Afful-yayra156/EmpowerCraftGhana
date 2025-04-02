@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listings | EmpowerSkills Ghana</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #ff9800, #ff5722);
+            color: white;
+            text-align: center;
+        }
+        .container {
+            width: 90%;
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            background: white;
+            color: black;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+            margin-top: 50px;
+        }
+        h2 {
+            color: #ff5722;
+        }
+        .listing-list {
+            margin-top: 20px;
+        }
+        .listing-item {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            text-align: left;
+        }
+        .listing-item button {
+            background-color: #ff5722;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .add-listing {
+            display: none;
+            margin-top: 20px;
+        }
+        .add-listing input, .add-listing textarea {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+        }
+        .add-listing button {
+            background-color: #ff9800;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .nav {
+            display: flex;
+            justify-content: space-around;
+            padding: 10px;
+            background: #ff5722;
+            border-radius: 5px;
+        }
+        .nav a {
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+            padding: 10px;
+        }
+        .nav a:hover {
+            background: #e64a19;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Available Listings</h2>
+        <div class="nav">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="services.html">Services</a>
+            <a href="orders.html">Orders</a>
+            <a href="messages.html">Messages</a>
+        </div>
+
+        <div id="listingList" class="listing-list"></div>
+
+        <div id="addListingForm" class="add-listing">
+            <h3>Add a New Listing</h3>
+            <input type="text" id="listingTitle" placeholder="Listing Title" required>
+            <textarea id="listingDescription" placeholder="Listing Description" required></textarea>
+            <input type="number" id="listingPrice" placeholder="Price (GHS)" required>
+            <input type="number" id="listingQuantity" placeholder="Quantity" required>
+            <button onclick="addListing()">Add Listing</button>
+        </div>
+
+        <button id="showAddListing" style="margin-top: 20px;">Add a Listing</button>
+    </div>
+
+    <script>
+        let user = JSON.parse(localStorage.getItem("loggedInUser"));
+
+        if (!user) {
+            alert("Please log in first!");
+            window.location.href = "login.php";
+        }
+
+        let listingList = document.getElementById("listingList");
+        let addListingForm = document.getElementById("addListingForm");
+        let showAddListingBtn = document.getElementById("showAddListing");
+
+        // Sample listings (Replace with API call)
+        let listings = [
+            { id: 1, title: "Handmade Beaded Necklace", description: "Beautiful hand-crafted necklace.", price: "50", quantity: 5 },
+            { id: 2, title: "Wooden Carving", description: "Traditional Ghanaian wooden sculpture.", price: "200", quantity: 2 }
+        ];
+
+        function renderListings() {
+            listingList.innerHTML = "";
+            listings.forEach(listing => {
+                let listingItem = document.createElement("div");
+                listingItem.classList.add("listing-item");
+                listingItem.innerHTML = `
+                    <h3>${listing.title}</h3>
+                    <p>${listing.description}</p>
+                    <p><strong>Price:</strong> GHS ${listing.price}</p>
+                    <p><strong>Quantity Available:</strong> ${listing.quantity}</p>
+                    ${user.userType === "client" ? `<button onclick="buyListing(${listing.id})">Buy Now</button>` : ""}
+                `;
+                listingList.appendChild(listingItem);
+            });
+        }
+
+        function addListing() {
+            let title = document.getElementById("listingTitle").value;
+            let description = document.getElementById("listingDescription").value;
+            let price = document.getElementById("listingPrice").value;
+            let quantity = document.getElementById("listingQuantity").value;
+
+            if (title && description && price && quantity) {
+                let newListing = { id: listings.length + 1, title, description, price, quantity };
+                listings.push(newListing);
+                renderListings();
+                addListingForm.style.display = "none";
+            } else {
+                alert("Please fill all fields.");
+            }
+        }
+
+        function buyListing(listingId) {
+            alert("Item added to cart!");
+        }
+
+        showAddListingBtn.addEventListener("click", () => {
+            addListingForm.style.display = "block";
+        });
+
+        if (user.userType === "artisan") {
+            showAddListingBtn.style.display = "block";
+        } else {
+            showAddListingBtn.style.display = "none";
+        }
+
+        renderListings();
+    </script>
+
+</body>
+</html>

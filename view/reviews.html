@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reviews & Ratings | EmpowerSkills Ghana</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #4CAF50, #087F23);
+            color: white;
+            text-align: center;
+        }
+        .container {
+            width: 90%;
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            background: white;
+            color: black;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+            margin-top: 50px;
+        }
+        h2 {
+            color: #087F23;
+        }
+        .nav {
+            display: flex;
+            justify-content: space-around;
+            padding: 10px;
+            background: #087F23;
+            border-radius: 5px;
+        }
+        .nav a {
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+            padding: 10px;
+        }
+        .nav a:hover {
+            background: #1B5E20;
+            border-radius: 5px;
+        }
+        .review-box {
+            margin-top: 20px;
+            padding: 15px;
+            border-bottom: 1px solid #ccc;
+            text-align: left;
+        }
+        .review-box strong {
+            color: #087F23;
+        }
+        .rating {
+            color: gold;
+        }
+        .review-form {
+            margin-top: 20px;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 5px;
+            text-align: left;
+        }
+        textarea, select, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background: #087F23;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #1B5E20;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Reviews & Ratings</h2>
+        <div class="nav">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="services.html">Services</a>
+            <a href="listings.html">Listings</a>
+            <a href="orders.html">Orders</a>
+        </div>
+
+        <!-- Existing Reviews Section -->
+        <div id="reviewsSection">
+            <div class="review-box">
+                <strong>Afriyie Amankwah</strong> <span class="rating">★★★★★</span>
+                <p>Great service! Very professional and timely.</p>
+            </div>
+            <div class="review-box">
+                <strong>Kwame Boateng</strong> <span class="rating">★★★★☆</span>
+                <p>Good experience, but the delivery was slightly delayed.</p>
+            </div>
+        </div>
+
+        <!-- Add a Review Form -->
+        <div class="review-form">
+            <h3>Leave a Review</h3>
+            <select id="reviewType">
+                <option value="service">Service</option>
+                <option value="listing">Listing</option>
+                <option value="user">User</option>
+            </select>
+            <input type="text" id="reviewerName" placeholder="Your Name">
+            <select id="rating">
+                <option value="5">★★★★★ - Excellent</option>
+                <option value="4">★★★★☆ - Very Good</option>
+                <option value="3">★★★☆☆ - Average</option>
+                <option value="2">★★☆☆☆ - Poor</option>
+                <option value="1">★☆☆☆☆ - Terrible</option>
+            </select>
+            <textarea id="reviewText" placeholder="Write your review..."></textarea>
+            <button onclick="submitReview()">Submit Review</button>
+        </div>
+
+    </div>
+
+    <script>
+        function submitReview() {
+            let name = document.getElementById("reviewerName").value.trim();
+            let rating = document.getElementById("rating").value;
+            let reviewText = document.getElementById("reviewText").value.trim();
+            let reviewType = document.getElementById("reviewType").value;
+            
+            if (name === "" || reviewText === "") {
+                alert("Please fill out all fields before submitting.");
+                return;
+            }
+
+            let reviewsSection = document.getElementById("reviewsSection");
+            let newReview = document.createElement("div");
+            newReview.classList.add("review-box");
+            newReview.innerHTML = `<strong>${name}</strong> <span class="rating">${"★".repeat(rating)}${"☆".repeat(5 - rating)}</span>
+                                   <p>${reviewText} <br><em>(Reviewed: ${reviewType})</em></p>`;
+            
+            reviewsSection.prepend(newReview); // Add review at the top
+            document.getElementById("reviewerName").value = "";
+            document.getElementById("reviewText").value = "";
+            alert("Review submitted successfully!");
+        }
+    </script>
+
+</body>
+</html>

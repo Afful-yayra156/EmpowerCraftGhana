@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages | EmpowerSkills Ghana</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #4CAF50, #087F23);
+            color: white;
+            text-align: center;
+        }
+        .container {
+            width: 90%;
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            background: white;
+            color: black;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+            margin-top: 50px;
+        }
+        h2 {
+            color: #087F23;
+        }
+        .nav {
+            display: flex;
+            justify-content: space-around;
+            padding: 10px;
+            background: #087F23;
+            border-radius: 5px;
+        }
+        .nav a {
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+            padding: 10px;
+        }
+        .nav a:hover {
+            background: #1B5E20;
+            border-radius: 5px;
+        }
+        .chat-container {
+            display: flex;
+            margin-top: 20px;
+        }
+        .chat-list {
+            width: 30%;
+            border-right: 1px solid #ccc;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 5px;
+            text-align: left;
+        }
+        .chat-list div {
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #ccc;
+        }
+        .chat-list div:hover {
+            background: #ddd;
+        }
+        .chat-box {
+            width: 70%;
+            padding: 10px;
+            height: 300px;
+            overflow-y: scroll;
+            background: #f9f9f9;
+            border-radius: 5px;
+            text-align: left;
+        }
+        .message {
+            padding: 5px;
+            margin: 5px 0;
+            border-radius: 5px;
+        }
+        .sent {
+            background: #4CAF50;
+            color: white;
+            text-align: right;
+        }
+        .received {
+            background: #ddd;
+            color: black;
+        }
+        .message-input {
+            display: flex;
+            margin-top: 10px;
+        }
+        input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px;
+            background: #087F23;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Messages</h2>
+        <div class="nav">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="services.html">Services</a>
+            <a href="listings.html">Listings</a>
+            <a href="orders.html">Orders</a>
+        </div>
+
+        <div class="chat-container">
+            <!-- Sidebar for chat list -->
+            <div class="chat-list" id="chatList">
+                <div onclick="loadChat('Afriyie Amankwah')">Afriyie Amankwah</div>
+                <div onclick="loadChat('Kwame Boateng')">Kwame Boateng</div>
+                <div onclick="loadChat('Nana Yaa Serwaa')">Nana Yaa Serwaa</div>
+            </div>
+
+            <!-- Chat messages -->
+            <div>
+                <h3 id="chatName">Select a chat</h3>
+                <div class="chat-box" id="chatBox">
+                    <!-- Messages will appear here -->
+                </div>
+
+                <div class="message-input">
+                    <input type="text" id="messageInput" placeholder="Type a message...">
+                    <button onclick="sendMessage()">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentChat = "";
+
+        function loadChat(name) {
+            currentChat = name;
+            document.getElementById("chatName").innerText = "Chat with " + name;
+            let chatBox = document.getElementById("chatBox");
+            chatBox.innerHTML = `
+                <div class="message received"><strong>${name}:</strong> Hello, I’m interested in your service.</div>
+                <div class="message sent"><strong>You:</strong> Hi! I’d be happy to assist. What do you need?</div>
+            `;
+        }
+
+        function sendMessage() {
+            let messageInput = document.getElementById("messageInput");
+            let messageText = messageInput.value.trim();
+            if (messageText !== "") {
+                let chatBox = document.getElementById("chatBox");
+                let messageDiv = document.createElement("div");
+                messageDiv.classList.add("message", "sent");
+                messageDiv.innerHTML = `<strong>You:</strong> ${messageText}`;
+                chatBox.appendChild(messageDiv);
+                chatBox.scrollTop = chatBox.scrollHeight;
+                messageInput.value = "";
+            }
+        }
+    </script>
+
+</body>
+</html>
