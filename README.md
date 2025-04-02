@@ -1,20 +1,27 @@
 # Empower Skills Ghana
 
-Empower Skills Ghana is a digital platform designed to connect skilled artisans, professionals, and creative individuals with potential clients while providing affordable skill development opportunities. The platform aims to bridge the gap between talent and market opportunities, promoting employment, entrepreneurship, and economic growth in Ghana and beyond.
+Empower Skills Ghana is a digital platform that connects skilled artisans, professionals, and creative individuals with potential clients while providing affordable skill development opportunities. The platform aims to bridge the gap between talent and market opportunities, promoting employment, entrepreneurship, and economic growth in Ghana and beyond.
 
 
 Guided by Agile Software Development principles, we embrace flexibility, continuous improvement, and user-driven innovation to ensure an intuitive, scalable, and impactful solution.
 
 
-#Table of Contents
+# Table of Contents
 
-Problem Statement
-Objectives
-Features
-Technology Stack
-Installation
-Usage
-Team Members
+1. Problem Statement
+2. Objectives
+
+3. Features
+4. Technology Stack
+5. Installation
+6. Usage
+
+# Team Members
+1. Beatrice Abraham
+2. Phiwayinkhosi Lukhele Precious
+3. Eunice Sayubu
+4. Velma Atieno
+5. Elizabeth Avevor Afful
 
 
 # Problem Statement
