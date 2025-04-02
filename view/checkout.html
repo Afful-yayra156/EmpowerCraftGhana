@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout | EmpowerSkills Ghana</title>
+    <script src="https://checkout.flutterwave.com/v3.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #4CAF50, #087F23);
+            color: white;
+            text-align: center;
+        }
+        .container {
+            width: 90%;
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background: white;
+            color: black;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+            margin-top: 50px;
+        }
+        h2 {
+            color: #087F23;
+        }
+        .nav {
+            display: flex;
+            justify-content: space-around;
+            padding: 10px;
+            background: #087F23;
+            border-radius: 5px;
+        }
+        .nav a {
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+            padding: 10px;
+        }
+        .nav a:hover {
+            background: #1B5E20;
+            border-radius: 5px;
+        }
+        .form-group {
+            margin: 15px 0;
+            text-align: left;
+        }
+        label {
+            font-weight: bold;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background: #087F23;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #1B5E20;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Checkout</h2>
+        <div class="nav">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="services.html">Services</a>
+            <a href="listings.html">Listings</a>
+            <a href="orders.html">Orders</a>
+        </div>
+
+        <!-- Checkout Form -->
+        <div>
+            <div class="form-group">
+                <label for="fullName">Full Name</label>
+                <input type="text" id="fullName" placeholder="Enter your full name">
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" placeholder="Enter your email">
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Your Phone Number</label>
+                <input type="tel" id="phone" placeholder="Enter your phone number">
+            </div>
+
+            <div class="form-group">
+                <label for="amount">Amount (GHS)</label>
+                <input type="number" id="amount" placeholder="Enter amount to pay">
+            </div>
+
+            <div class="form-group">
+                <label for="paymentMethod">Select Payment Method</label>
+                <select id="paymentMethod" onchange="toggleMobileMoneyFields()">
+                    <option value="flutterwave">Card/Bank (Flutterwave)</option>
+                    <option value="mobile_money">Mobile Money</option>
+                </select>
+            </div>
+
+            <!-- Mobile Money Fields (Hidden Initially) -->
+            <div id="mobileMoneyFields" class="hidden">
+                <div class="form-group">
+                    <label for="network">Select Mobile Money Network</label>
+                    <select id="network">
+                        <option value="mtn">MTN Mobile Money</option>
+                        <option value="vodafone">Vodafone Cash</option>
+                        <option value="airteltigo">AirtelTigo Money</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="receiverPhone">Receiver's Phone Number</label>
+                    <input type="tel" id="receiverPhone" placeholder="Enter receiver's phone number">
+                </div>
+            </div>
+
+            <button onclick="makePayment()">Proceed to Payment</button>
+        </div>
+
+    </div>
+
+    <script>
+        function toggleMobileMoneyFields() {
+            let paymentMethod = document.getElementById("paymentMethod").value;
+            let mobileMoneyFields = document.getElementById("mobileMoneyFields");
+
+            if (paymentMethod === "mobile_money") {
+                mobileMoneyFields.classList.remove("hidden");
+            } else {
+                mobileMoneyFields.classList.add("hidden");
+            }
+        }
+
+        function makePayment() {
+            let fullName = document.getElementById("fullName").value.trim();
+            let email = document.getElementById("email").value.trim();
+            let phone = document.getElementById("phone").value.trim();
+            let amount = document.getElementById("amount").value.trim();
+            let paymentMethod = document.getElementById("paymentMethod").value;
+
+            if (fullName === "" || email === "" || phone === "" || amount === "") {
+                alert("Please fill all fields before proceeding.");
+                return;
+            }
+
+            if (paymentMethod === "mobile_money") {
+                let network = document.getElementById("network").value;
+                let receiverPhone = document.getElementById("receiverPhone").value.trim();
+
+                if (receiverPhone === "") {
+                    alert("Please enter the receiver's phone number.");
+                    return;
+                }
+
+                let mobileMoneyType = "mobilemoneyghana"; 
+
+                FlutterwaveCheckout({
+                    public_key: "FLWPUBK_TEST-xxxxxxxxxxxxxxxxxxxxx-X", // Replace with your Flutterwave public key
+                    tx_ref: "EmpowerSkills-" + Math.floor(Math.random() * 1000000),
+                    amount: amount,
+                    currency: "GHS",
+                    payment_options: mobileMoneyType,
+                    redirect_url: "payment_success.html",
+                    customer: {
+                        email: email,
+                        phone_number: phone,
+                        name: fullName,
+                    },
+                    meta: {
+                        receiver_phone: receiverPhone,
+                        network: network,
+                    },
+                    customizations: {
+                        title: "EmpowerSkills Ghana",
+                        description: "Payment via Mobile Money",
+                        logo: "https://yourwebsite.com/logo.png",
+                    },
+                });
+
+            } else {
+                FlutterwaveCheckout({
+                    public_key: "FLWPUBK_TEST-xxxxxxxxxxxxxxxxxxxxx-X", // Replace with your Flutterwave public key
+                    tx_ref: "EmpowerSkills-" + Math.floor(Math.random() * 1000000),
+                    amount: amount,
+                    currency: "GHS",
+                    payment_options: "card, banktransfer, ussd",
+                    redirect_url: "payment_success.html",
+                    customer: {
+                        email: email,
+                        phone_number: phone,
+                        name: fullName,
+                    },
+                    customizations: {
+                        title: "EmpowerSkills Ghana",
+                        description: "Payment via Card/Bank Transfer",
+                        logo: "https://yourwebsite.com/logo.png",
+                    },
+                });
+            }
+        }
+    </script>
+
+</body>
+</html>

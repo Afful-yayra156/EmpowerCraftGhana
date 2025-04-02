@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | EmpowerSkills Ghana</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #4CAF50, #2E8B57);
+            color: white;
+            text-align: center;
+        }
+        .container {
+            width: 90%;
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            background: white;
+            color: black;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+            margin-top: 50px;
+        }
+        h2 {
+            color: #4CAF50;
+        }
+        .nav {
+            display: flex;
+            justify-content: space-around;
+            padding: 10px;
+            background: #2E8B57;
+            border-radius: 5px;
+        }
+        .nav a {
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+            padding: 10px;
+        }
+        .nav a:hover {
+            background: #45a049;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px;
+            background-color: red;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Welcome to Your Dashboard</h2>
+        <div class="nav" id="navLinks">
+            <!-- Links will be added dynamically -->
+        </div>
+        <p id="welcomeText"></p>
+        <button onclick="logout()">Logout</button>
+    </div>
+
+    <script>
+        // Get user details from local storage
+        let user = JSON.parse(localStorage.getItem("loggedInUser"));
+        if (!user) {
+            alert("You must be logged in!");
+            window.location.href = "login.php";
+        } else {
+            document.getElementById("welcomeText").innerText = "Hello, " + user.username + "!";
+            let navLinks = document.getElementById("navLinks");
+    
+            if (user.userType === "artisan") {
+                navLinks.innerHTML = `
+                    <a href="services.html">My Services</a>
+                    <a href="bookings.html">Bookings</a>
+                    <a href="messages.html">Messages</a>
+                    <a href="user_profile.html">Profile</a>
+                    <a href="reviews.html">Reviews</a>
+                `;
+            } else if (user.userType === "client") {
+                navLinks.innerHTML = `
+                    <a href="services.html">Find Services</a>
+                    <a href="listings.html">Shop Listings</a>
+                    <a href="orders.html">My Orders</a>
+                    <a href="messages.html">Messages</a>
+                    <a href="user_profile.html">Profile</a>
+                `;
+            } else if (user.userType === "admin") {
+                navLinks.innerHTML = `
+                    <a href="manage_users.html">Manage Users</a>
+                    <a href="manage_services.html">Manage Services</a>
+                    <a href="manage_orders.html">Manage Orders</a>
+                    <a href="reports.html">Reports</a>
+                    <a href="user_profile.html">Profile</a>
+                `;
+            }
+        }
+    
+        function logout() {
+            localStorage.removeItem("loggedInUser");
+            alert("Logged out successfully!");
+            window.location.href = "login.php";
+        }
+    </script>
+    
+
+</body>
+</html>

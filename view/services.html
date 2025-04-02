@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Services | EmpowerSkills Ghana</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #4CAF50, #2E8B57);
+            color: white;
+            text-align: center;
+        }
+        .container {
+            width: 90%;
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            background: white;
+            color: black;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+            margin-top: 50px;
+        }
+        h2 {
+            color: #4CAF50;
+        }
+        .service-list {
+            margin-top: 20px;
+        }
+        .service-item {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            text-align: left;
+        }
+        .service-item button {
+            background-color: #2E8B57;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .add-service {
+            display: none;
+            margin-top: 20px;
+        }
+        .add-service input, .add-service textarea {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+        }
+        .add-service button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .nav {
+            display: flex;
+            justify-content: space-around;
+            padding: 10px;
+            background: #2E8B57;
+            border-radius: 5px;
+        }
+        .nav a {
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+            padding: 10px;
+        }
+        .nav a:hover {
+            background: #45a049;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Available Services</h2>
+        <div class="nav">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="listings.html">Listings</a>
+            <a href="orders.html">Orders</a>
+            <a href="messages.html">Messages</a>
+        </div>
+
+        <div id="serviceList" class="service-list"></div>
+
+        <div id="addServiceForm" class="add-service">
+            <h3>Add a New Service</h3>
+            <input type="text" id="serviceTitle" placeholder="Service Title" required>
+            <textarea id="serviceDescription" placeholder="Service Description" required></textarea>
+            <input type="number" id="servicePrice" placeholder="Price (GHS)" required>
+            <button onclick="addService()">Add Service</button>
+        </div>
+
+        <button id="showAddService" style="margin-top: 20px;">Add a Service</button>
+    </div>
+
+    <script>
+        let user = JSON.parse(localStorage.getItem("loggedInUser"));
+
+        if (!user) {
+            alert("Please log in first!");
+            window.location.href = "login.php";
+        }
+
+        let serviceList = document.getElementById("serviceList");
+        let addServiceForm = document.getElementById("addServiceForm");
+        let showAddServiceBtn = document.getElementById("showAddService");
+
+        // Sample services (Replace with API call)
+        let services = [
+            { id: 1, title: "Makeup Artistry", description: "Professional makeup services for weddings & events.", price: "150" },
+            { id: 2, title: "Website Development", description: "Custom-built websites for businesses and brands.", price: "1200" }
+        ];
+
+        function renderServices() {
+            serviceList.innerHTML = "";
+            services.forEach(service => {
+                let serviceItem = document.createElement("div");
+                serviceItem.classList.add("service-item");
+                serviceItem.innerHTML = `
+                    <h3>${service.title}</h3>
+                    <p>${service.description}</p>
+                    <p><strong>Price:</strong> GHS ${service.price}</p>
+                    ${user.userType === "client" ? `<button onclick="bookService(${service.id})">Book Now</button>` : ""}
+                `;
+                serviceList.appendChild(serviceItem);
+            });
+        }
+
+        function addService() {
+            let title = document.getElementById("serviceTitle").value;
+            let description = document.getElementById("serviceDescription").value;
+            let price = document.getElementById("servicePrice").value;
+
+            if (title && description && price) {
+                let newService = { id: services.length + 1, title, description, price };
+                services.push(newService);
+                renderServices();
+                addServiceForm.style.display = "none";
+            } else {
+                alert("Please fill all fields.");
+            }
+        }
+
+        function bookService(serviceId) {
+            alert("Service booked successfully!");
+        }
+
+        showAddServiceBtn.addEventListener("click", () => {
+            addServiceForm.style.display = "block";
+        });
+
+        if (user.userType === "artisan") {
+            showAddServiceBtn.style.display = "block";
+        } else {
+            showAddServiceBtn.style.display = "none";
+        }
+
+        renderServices();
+    </script>
+
+</body>
+</html>
