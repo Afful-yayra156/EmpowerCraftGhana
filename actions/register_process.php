@@ -1,6 +1,6 @@
 <?php
 ob_start();
-include '../db/config.php';  
+include '../db/config.php';
 
 // Enable error reporting for debugging
 error_reporting(E_ALL);
@@ -14,10 +14,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $password = trim($_POST['password']);
     $confirm_password = trim($_POST['confirm_password']);
     
-
-
     // Get role from form data
-    $role = trim($_POST['userType']);  // Role selected by the user
+    $role = trim($_POST['userType']); // Role selected by the user
 
     // Validate required fields
     if (empty($fname) || empty($lname) || empty($email) || empty($password) || empty($confirm_password) || empty($role)) {
@@ -37,10 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     if ($results->num_rows > 0) {
         echo '<script>alert("User already registered.");</script>';
-
         echo '<script>window.location.href = "../view/signup.html";</script>';
-
-        echo '<script>window.location.href = "signup.html";</script>';
         exit();
     } else {
         // Hash password before storing
@@ -56,12 +51,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if ($stmt->execute()) {
             $_SESSION['fname'] = $fname;
             header('Location: ../view/login.php');
-     
+            exit();
         } else {
             header('Location: ../view/signup.php'); 
+            exit();
         }
     }
-
+    
     $stmt->close();
 }
 

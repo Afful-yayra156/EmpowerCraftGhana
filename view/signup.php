@@ -8,8 +8,10 @@
 </head>
 <body>
 
+    <!-- Signup Form Container -->
     <div class="container">
         <h2>Signup</h2>
+        <!-- The signup form with validation on submit -->
         <form id="signupForm" action="../actions/register_process.php" method="post" onsubmit="return validateForm()">
             <input type="text" id="firstname" name="firstname" placeholder="First Name" required>
             <input type="text" id="lastname" name="lastname" placeholder="Last Name" required>
@@ -22,21 +24,31 @@
             <input type="password" id="password" name="password" placeholder="Password" required>
             <input type="password" id="confirmPassword" name="confirm_password" placeholder="Confirm Password" required>
         
+            <!-- Error message container for password-related issues -->
             <div id="passwordError" style="color: red;"></div>
+            <!-- Success message container -->
             <div id="successMessage" style="color: green;"></div>
         
+            <!-- Submit button for the form -->
             <button type="submit">Sign Up</button>
         </form>
         
+        <!-- Link to login page if the user already has an account -->
         <a href="../view/login.php">Already have an account? Login</a>
     </div>
 
+    <!-- Form Validation Script -->
     <script>
         function validateForm() {
+            // Get form values
             const email = document.getElementById("email").value.trim();
             const password = document.getElementById("password").value.trim();
             const confirmPassword = document.getElementById("confirmPassword").value.trim();
+            
+            // Arrays for error messages
             const errorMessages = [];
+            
+            // Access error message containers
             const passwordError = document.getElementById("passwordError");
             const successMessage = document.getElementById("successMessage");
         
@@ -44,6 +56,7 @@
             passwordError.innerHTML = "";
             successMessage.textContent = "";
         
+            // Regular expression for email validation
             const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
             // Validate email format
@@ -67,19 +80,21 @@
                 errorMessages.push("Password must contain at least one special character!");
             }
         
-            // Ensure passwords match
+            // Check if passwords match
             if (password !== confirmPassword) {
                 errorMessages.push("Passwords do not match.");
             }
         
-            // Display errors or success message
+            // If there are errors, display them and prevent form submission
             if (errorMessages.length > 0) {
                 passwordError.innerHTML = errorMessages.join("<br>");
                 return false; // Prevent form submission if errors exist
             } else {
+                // Success message if the form is valid
                 successMessage.textContent = "Registered successfully!";
+                // Clear success message after 20 seconds
                 setTimeout(function () {
-                    successMessage.textContent = ""; // Clear message after 20 seconds
+                    successMessage.textContent = ""; 
                 }, 20000);
         
                 return true; // Allow form submission if no errors
@@ -89,4 +104,3 @@
 
 </body>
 </html>
-

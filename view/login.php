@@ -7,42 +7,48 @@
     <title>Login | EmpowerSkills Ghana</title>
 </head>
 
-
 <body>
 
-    <!-- Login Form -->
+    <!-- Login Form Container -->
     <div class="container">
         <h2>Login</h2>
+        <!-- Login form that triggers validation on submit -->
         <form id="loginForm" action="../actions/login_process.php" method="post" onsubmit="return formvalidate()">
-            <input type="email" id="email" placeholder="Email" required>
-            <input type="password" id="password" placeholder="Password" required>
+            <input type="email" id="email" name="email" placeholder="Email" required>
+            <input type="password" id="password" name="password" placeholder="Password" required>
+
+            <!-- Error messages for invalid input -->
             <span id="passwordError" style="color:rgb(255, 3, 3);"></span><br><br>
             <div id="loginError" style="color: red;"></div>
             <div id="loginSuccess" style="color: green;"></div>
+            
+            <!-- Submit button for the form -->
             <button type="submit">Login</button>
         </form>
+        
+        <!-- Link to Signup page if user doesn't have an account -->
         <a href="signup.php">Don't have an account? Sign Up</a>
     </div>
 
     <!-- Form Validation Script -->
-
-
     <script>
         function formvalidate() {
             var email = document.getElementById("email").value;
             var password = document.getElementById("password").value;
             var errorMessages = [];
             var passwordError = document.getElementById("passwordError");
-            passwordError.textContent = "";
+            passwordError.textContent = ""; // Clear previous error messages
 
             var emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
+            // Validate email format and presence
             if (email === "") {
                 errorMessages.push("Email is required!");
             } else if (!emailPattern.test(email)) {
                 errorMessages.push("Invalid email format");
             }
 
+            // Password validations
             if (password.length < 8) {
                 errorMessages.push("Password must be at least 8 characters!");
             }
@@ -56,11 +62,12 @@
                 errorMessages.push("Password must contain at least one special character!");
             }
 
+            // Display errors and prevent form submission if invalid
             if (errorMessages.length > 0) {
                 passwordError.innerHTML = errorMessages.join("<br>");
                 return false;
             } else {
-                return true;
+                return true; // Proceed with form submission if valid
             }
         }
     </script>
