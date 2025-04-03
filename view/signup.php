@@ -10,23 +10,24 @@
 
     <div class="container">
         <h2>Signup</h2>
-        <form id="signupForm" onsubmit="return validateForm()">
-            <input type="text" id="username" placeholder="Username" required>
-            <input type="email" id="email" placeholder="Email" required>
-            <input type="tel" id="phone" placeholder="Phone Number" required>
-            <select id="userType">
+        <form id="signupForm" action="../actions/register_process.php" method="post" onsubmit="return validateForm()">
+            <input type="text" id="firstname" name="firstname" placeholder="First Name" required>
+            <input type="text" id="lastname" name="lastname" placeholder="Last Name" required>
+            <input type="email" id="email" name="email" placeholder="Email" required>
+            <input type="tel" id="phone" name="phone" placeholder="Phone Number" required>
+            <select id="userType" name="userType">
                 <option value="artisan">Artisan</option>
                 <option value="client">Client</option>
             </select>
-            <input type="password" id="password" placeholder="Password" required>
-            <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
-            
-            <!-- Display error messages for validation -->
+            <input type="password" id="password" name="password" placeholder="Password" required>
+            <input type="password" id="confirmPassword" name="confirm_password" placeholder="Confirm Password" required>
+        
             <div id="passwordError" style="color: red;"></div>
             <div id="successMessage" style="color: green;"></div>
-            
+        
             <button type="submit">Sign Up</button>
         </form>
+        
         <a href="../view/login.php">Already have an account? Login</a>
     </div>
 

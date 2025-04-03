@@ -13,7 +13,7 @@
     <!-- Login Form -->
     <div class="container">
         <h2>Login</h2>
-        <form id="loginForm" onsubmit="return formvalidate()">
+        <form id="loginForm" action="../actions/login_process.php" method="post" onsubmit="return formvalidate()">
             <input type="email" id="email" placeholder="Email" required>
             <input type="password" id="password" placeholder="Password" required>
             <span id="passwordError" style="color:rgb(255, 3, 3);"></span><br><br>
