@@ -6,84 +6,259 @@
     <title>Checkout | EmpowerSkills Ghana</title>
     <script src="https://checkout.flutterwave.com/v3.js"></script>
     <style>
+        :root {
+            --primary: #1e8765;
+            --primary-light: #e9f5f1;
+            --primary-dark: #145c44;
+            --accent: #3a7ca5;
+            --accent-light: #d6ebf7;
+            --neutral-dark: #333333;
+            --neutral-mid: #717171;
+            --neutral-light: #f7f9fa;
+            --shadow: rgba(0, 0, 0, 0.08);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
         body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(to right, #4CAF50, #087F23);
-            color: white;
-            text-align: center;
-        }
-        .container {
-            width: 90%;
-            max-width: 600px;
-            margin: auto;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f3f9f7, #e3f2fd);
+            color: var(--neutral-dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 550px;
             background: white;
-            color: black;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
-            margin-top: 50px;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px var(--shadow);
+            overflow: hidden;
         }
-        h2 {
-            color: #087F23;
+        
+        .header {
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            padding: 25px 0;
+            text-align: center;
+            position: relative;
         }
+        
+        .header h2 {
+            color: white;
+            font-weight: 600;
+            font-size: 24px;
+            margin: 0;
+            letter-spacing: 0.3px;
+        }
+        
         .nav {
             display: flex;
-            justify-content: space-around;
-            padding: 10px;
-            background: #087F23;
-            border-radius: 5px;
+            justify-content: center;
+            background-color: white;
+            padding: 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
         }
+        
         .nav a {
             text-decoration: none;
-            color: white;
-            font-weight: bold;
-            padding: 10px;
+            color: var(--neutral-mid);
+            font-weight: 500;
+            padding: 16px 12px;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            border-bottom: 2px solid transparent;
         }
-        .nav a:hover {
-            background: #1B5E20;
-            border-radius: 5px;
+        
+        .nav a:hover, .nav a.active {
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
         }
+        
+        .form-container {
+            padding: 25px 30px 30px;
+        }
+        
+        .form-title {
+            margin-bottom: 20px;
+            font-size: 18px;
+            color: var(--neutral-dark);
+            font-weight: 600;
+        }
+        
         .form-group {
-            margin: 15px 0;
-            text-align: left;
+            margin-bottom: 20px;
         }
+        
         label {
-            font-weight: bold;
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--neutral-dark);
+            margin-bottom: 6px;
         }
-        input, select, button {
+        
+        input, select {
             width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+            padding: 12px 15px;
+            border: 1px solid #dce1e4;
+            border-radius: 6px;
+            font-size: 15px;
+            transition: all 0.2s;
+            background-color: white;
+            color: var(--neutral-dark);
         }
-        button {
-            background: #087F23;
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(30, 135, 101, 0.12);
+        }
+        
+        input::placeholder {
+            color: #b0b7bc;
+        }
+        
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
             color: white;
             border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 500;
             cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
         }
-        button:hover {
-            background: #1B5E20;
+        
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(30, 135, 101, 0.15);
         }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .payment-options {
+            margin-bottom: 15px;
+        }
+        
+        .payment-options-title {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+        
+        .payment-method-selector {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .payment-method-option {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            border: 1px solid #dce1e4;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        
+        .payment-method-option.active {
+            border-color: var(--primary);
+            background-color: var(--primary-light);
+        }
+        
+        .payment-method-option:hover:not(.active) {
+            background-color: var(--neutral-light);
+        }
+        
         .hidden {
             display: none;
+        }
+        
+        .section-divider {
+            height: 1px;
+            background-color: #f0f0f0;
+            margin: 25px 0;
+        }
+        
+        .secured-by {
+            text-align: center;
+            font-size: 12px;
+            color: var(--neutral-mid);
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .lock-icon {
+            width: 12px;
+            height: 12px;
+            fill: var(--neutral-mid);
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 0;
+                box-shadow: none;
+                height: 100%;
+            }
+            
+            body {
+                padding: 0;
+            }
+            
+            .nav {
+                overflow-x: auto;
+                justify-content: flex-start;
+            }
+            
+            .nav a {
+                flex: 0 0 auto;
+                white-space: nowrap;
+            }
+            
+            .form-container {
+                padding: 20px;
+            }
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h2>Checkout</h2>
+        <div class="header">
+            <h2>Checkout</h2>
+        </div>
+        
         <div class="nav">
             <a href="dashboard.html">Dashboard</a>
             <a href="services.html">Services</a>
             <a href="listings.html">Listings</a>
             <a href="orders.html">Orders</a>
+            <a href="#" class="active">Checkout</a>
         </div>
 
-        <!-- Checkout Form -->
-        <div>
+        <div class="form-container">
+            <h3 class="form-title">Payment Information</h3>
+            
             <div class="form-group">
                 <label for="fullName">Full Name</label>
                 <input type="text" id="fullName" placeholder="Enter your full name">
@@ -95,7 +270,7 @@
             </div>
 
             <div class="form-group">
-                <label for="phone">Your Phone Number</label>
+                <label for="phone">Phone Number</label>
                 <input type="tel" id="phone" placeholder="Enter your phone number">
             </div>
 
@@ -104,18 +279,24 @@
                 <input type="number" id="amount" placeholder="Enter amount to pay">
             </div>
 
-            <div class="form-group">
-                <label for="paymentMethod">Select Payment Method</label>
-                <select id="paymentMethod" onchange="toggleMobileMoneyFields()">
-                    <option value="flutterwave">Card/Bank (Flutterwave)</option>
-                    <option value="mobile_money">Mobile Money</option>
-                </select>
+            <div class="section-divider"></div>
+            
+            <div class="payment-options">
+                <div class="payment-options-title">Select Payment Method</div>
+                <div class="payment-method-selector">
+                    <div class="payment-method-option active" id="cardOption" onclick="selectPaymentMethod('flutterwave')">
+                        Card/Bank
+                    </div>
+                    <div class="payment-method-option" id="mobileOption" onclick="selectPaymentMethod('mobile_money')">
+                        Mobile Money
+                    </div>
+                </div>
             </div>
 
             <!-- Mobile Money Fields (Hidden Initially) -->
             <div id="mobileMoneyFields" class="hidden">
                 <div class="form-group">
-                    <label for="network">Select Mobile Money Network</label>
+                    <label for="network">Mobile Money Network</label>
                     <select id="network">
                         <option value="mtn">MTN Mobile Money</option>
                         <option value="vodafone">Vodafone Cash</option>
@@ -129,20 +310,34 @@
                 </div>
             </div>
 
-            <button onclick="makePayment()">Proceed to Payment</button>
+            <button class="btn" onclick="makePayment()">Proceed to Payment</button>
+            
+            <div class="secured-by">
+                <svg class="lock-icon" viewBox="0 0 24 24">
+                    <path d="M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.9,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z" />
+                </svg>
+                Secured by Flutterwave
+            </div>
         </div>
-
     </div>
 
     <script>
-        function toggleMobileMoneyFields() {
-            let paymentMethod = document.getElementById("paymentMethod").value;
+        let selectedPaymentMethod = "flutterwave";
+        
+        function selectPaymentMethod(method) {
+            selectedPaymentMethod = method;
             let mobileMoneyFields = document.getElementById("mobileMoneyFields");
-
-            if (paymentMethod === "mobile_money") {
+            let cardOption = document.getElementById("cardOption");
+            let mobileOption = document.getElementById("mobileOption");
+            
+            if (method === "mobile_money") {
                 mobileMoneyFields.classList.remove("hidden");
+                cardOption.classList.remove("active");
+                mobileOption.classList.add("active");
             } else {
                 mobileMoneyFields.classList.add("hidden");
+                cardOption.classList.add("active");
+                mobileOption.classList.remove("active");
             }
         }
 
@@ -151,14 +346,13 @@
             let email = document.getElementById("email").value.trim();
             let phone = document.getElementById("phone").value.trim();
             let amount = document.getElementById("amount").value.trim();
-            let paymentMethod = document.getElementById("paymentMethod").value;
 
             if (fullName === "" || email === "" || phone === "" || amount === "") {
                 alert("Please fill all fields before proceeding.");
                 return;
             }
 
-            if (paymentMethod === "mobile_money") {
+            if (selectedPaymentMethod === "mobile_money") {
                 let network = document.getElementById("network").value;
                 let receiverPhone = document.getElementById("receiverPhone").value.trim();
 
