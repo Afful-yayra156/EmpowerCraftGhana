@@ -408,7 +408,7 @@
                     <button type="submit" class="login-button">Log In</button>
 
                     <div class="signup-link">
-                        Don't have an account? <a href="signup.html">Sign Up</a>
+                        Don't have an account? <a href="signup.php">Sign Up</a>
                     </div>
                 </form>
             </div>
