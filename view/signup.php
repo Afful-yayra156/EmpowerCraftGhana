@@ -501,7 +501,7 @@
                     
                     <button type="submit">Sign Up</button>
                 </form>
-                <a href="login.html">Already have an account? Login</a>
+                <a href="login.php">Already have an account? Login</a>
             </div>
             
             <!-- Right Side Column -->
