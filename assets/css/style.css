@@ -1,0 +1,140 @@
+/* style.css */
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background-color: #DFF3E3;
+    color: #1E1E1E;
+  }
+  
+  .sidebar {
+    width: 220px;
+    background: #0E5F3C;
+    color: white;
+    position: fixed;
+    top: 0; left: 0;
+    height: 100vh;
+    padding: 2rem 1rem;
+  }
+  
+  .sidebar h2 {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  
+  .sidebar nav a {
+    display: block;
+    color: white;
+    text-decoration: none;
+    padding: 1rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    transition: background 0.3s ease;
+  }
+  
+  .sidebar nav a:hover {
+    background-color: #148c5f;
+  }
+  
+  .dashboard-main {
+    margin-left: 240px;
+    padding: 2rem;
+  }
+  
+  .dashboard-header h1 {
+    font-size: 2rem;
+    color: #0E5F3C;
+  }
+  
+  .dashboard-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+  
+  .card {
+    background-color: white;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    text-align: center;
+  }
+  
+  .dashboard-section {
+    margin-top: 2rem;
+  }
+  
+  .message-box {
+    background: white;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 6px;
+  }
+  
+  .profile-body {
+    background-color: #DFF3E3;
+  }
+  
+  .profile-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+  }
+  
+  .profile-header {
+    text-align: center;
+  }
+  
+  .avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+  }
+  
+  .profile-info, .edit-profile, .reviews-comments {
+    margin-top: 2rem;
+  }
+  
+  .profile-info ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .profile-info li {
+    margin-bottom: 0.5rem;
+  }
+  
+  form input, form textarea {
+    display: block;
+    width: 100%;
+    margin-top: 1rem;
+    padding: 0.8rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+  }
+  
+  form button {
+    margin-top: 1rem;
+    padding: 0.8rem 1.5rem;
+    background-color: #0E5F3C;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  
+  form button:hover {
+    background-color: #148c5f;
+  }
+  
+  .review {
+    background: #f2fef5;
+    padding: 1rem;
+    border-left: 4px solid #0E5F3C;
+    margin-bottom: 1rem;
+  }
+  
