@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 29, 2025 at 12:47 PM
+-- Generation Time: Apr 08, 2025 at 08:11 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `empowerskills`
+-- Database: `empowerhub`
 --
 
 -- --------------------------------------------------------
@@ -107,7 +107,7 @@ CREATE TABLE `listing_images` (
 --
 -- Table structure for table `messages`
 --
---The message table 
+
 CREATE TABLE `messages` (
   `message_id` int(11) NOT NULL,
   `sender_id` int(11) NOT NULL,
@@ -250,7 +250,7 @@ CREATE TABLE `service_images` (
 CREATE TABLE `users` (
   `user_id` int(11) NOT NULL,
   `email` varchar(100) NOT NULL,
-  `phone_number` varchar(15) NOT NULL,
+  `phone_number` varchar(15) DEFAULT NULL,
   `password_hash` varchar(255) NOT NULL,
   `user_type` enum('artisan','client','admin','account_manager') NOT NULL,
   `first_name` varchar(50) NOT NULL,
@@ -270,7 +270,13 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`user_id`, `email`, `phone_number`, `password_hash`, `user_type`, `first_name`, `last_name`, `profile_picture`, `bio`, `location`, `registration_date`, `last_login`, `is_verified`, `account_status`, `average_rating`) VALUES
-(1, 'nuhefa@mailinator.com', '', '$2y$10$aFLgkcBu.KWNRnEpLgM/.uqPp43GrwhkR8MMQbw0FlhD245VkQ1Ue', 'client', 'Dahlia', 'Ramirez', NULL, NULL, NULL, '2025-03-29 02:17:41', NULL, 0, 'active', 0.00);
+(1, 'nuhefa@mailinator.com', '', '$2y$10$aFLgkcBu.KWNRnEpLgM/.uqPp43GrwhkR8MMQbw0FlhD245VkQ1Ue', 'client', 'Dahlia', 'Ramirez', NULL, NULL, NULL, '2025-03-29 02:17:41', NULL, 0, 'active', 0.00),
+(7, 'hacasybe@mailinator.com', NULL, '$2y$10$YRLhQni6EA9IyTt6Ro8.NeW67adS1gdrp.fe9qcXbqudNo.ypyi3u', 'artisan', 'Robert', 'Leach', NULL, NULL, NULL, '2025-04-03 14:47:21', NULL, 0, 'active', 0.00),
+(8, 'wimyhivab@mailinator.com', NULL, '$2y$10$WaerlV9Z5KNb6lwMb0Wpbees7a0..Ypv2hqNtd2X6DYtsOBt6Xwaa', 'client', 'Neve', 'Slater', NULL, NULL, NULL, '2025-04-03 22:33:06', NULL, 0, 'active', 0.00),
+(9, 'zicyzizoto@mailinator.com', NULL, '$2y$10$E3YvOpMzHzeWyiMpj.ljReZ0P80oXllxt7tdPpqHFkXZiWwTPBQv2', 'client', 'Sylvia', 'Lane', NULL, NULL, NULL, '2025-04-03 23:05:33', NULL, 0, 'active', 0.00),
+(10, 'haku@mailinator.com', NULL, '$2y$10$ySXkq8xrrWKoAAtP5gVnUObVnrmsLoVTPGBp36i4/ZCgg0rG2rrxG', 'client', 'Tana', 'Buck', NULL, NULL, NULL, '2025-04-03 23:21:24', NULL, 0, 'active', 0.00),
+(12, 'vapuwyheh@mailinator.com', NULL, '$2y$10$SKvp6HOzF4BYtnNIaDdC6ex27GZGB6SYMcb5/F/SRmw2D2Fr8yd3W', 'artisan', 'Murphy', 'Giles', NULL, NULL, NULL, '2025-04-03 23:35:47', NULL, 0, 'active', 0.00),
+(13, 'lise@mailinator.com', NULL, '$2y$10$2NfcnuJi9YaPOaXJA1Jov.Nhh0CTcdsJQBwy/D0mf2v7FxO1XK4oK', 'artisan', 'Mia', 'Snyder', NULL, NULL, NULL, '2025-04-03 23:38:42', NULL, 0, 'active', 0.00);
 
 --
 -- Indexes for dumped tables
@@ -477,7 +483,7 @@ ALTER TABLE `service_images`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- Constraints for dumped tables
@@ -536,41 +542,6 @@ ALTER TABLE `notifications`
 --
 ALTER TABLE `orders`
   ADD CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`buyer_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
-
---
--- Constraints for table `order_items`
---
-ALTER TABLE `order_items`
-  ADD CONSTRAINT `order_items_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`listing_id`) REFERENCES `listings` (`listing_id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `order_items_ibfk_3` FOREIGN KEY (`seller_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
-
---
--- Constraints for table `payments`
---
-ALTER TABLE `payments`
-  ADD CONSTRAINT `payments_ibfk_1` FOREIGN KEY (`payer_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `payments_ibfk_2` FOREIGN KEY (`payee_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
-
---
--- Constraints for table `reviews`
---
-ALTER TABLE `reviews`
-  ADD CONSTRAINT `reviews_ibfk_1` FOREIGN KEY (`reviewer_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `reviews_ibfk_2` FOREIGN KEY (`reviewed_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
-
---
--- Constraints for table `services`
---
-ALTER TABLE `services`
-  ADD CONSTRAINT `services_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `services_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `categories` (`category_id`) ON DELETE CASCADE;
-
---
--- Constraints for table `service_images`
---
-ALTER TABLE `service_images`
-  ADD CONSTRAINT `service_images_ibfk_1` FOREIGN KEY (`service_id`) REFERENCES `services` (`service_id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
