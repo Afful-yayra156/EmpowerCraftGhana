@@ -24,7 +24,7 @@
       left: 0;
       width: 250px;
       height: 100vh;
-      background-color: #1e4d2b;
+      background: linear-gradient(135deg, #4CAF50, #2196F3);
       color: white;
       padding: 20px;
       display: flex;
@@ -71,12 +71,34 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
 
+    .avatar-container {
+      position: relative;
+    }
+
     .avatar {
       width: 100px;
       height: 100px;
       border-radius: 50%;
       object-fit: cover;
       border: 3px solid #3d7b50;
+    }
+
+    .change-avatar {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      background: linear-gradient(135deg, #4CAF50, #2196F3);
+      color: white;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: 2px solid white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      font-size: 14px;
     }
 
     .profile-columns {
@@ -140,6 +162,11 @@
       background-color: #f6fdf8;
       border-left: 5px solid #3d7b50;
     }
+
+    /* Hide the file input visually */
+    #avatar-upload {
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -157,7 +184,11 @@
 
   <main class="profile-main-full">
     <section class="profile-header">
-      <img src="../assets/images/velma.jpg" alt="User Avatar" class="avatar"/>
+      <div class="avatar-container">
+        <img src="../assets/images/velma.jpg" alt="User Avatar" class="avatar"/>
+        <label for="avatar-upload" class="change-avatar" title="Change Profile Picture">📷</label>
+        <input type="file" id="avatar-upload" accept="image/*"/>
+      </div>
       <div>
         <h1>User Full Name</h1>
         <p>Artisan - Woodwork & Decor</p>
