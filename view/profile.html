@@ -167,6 +167,28 @@
     #avatar-upload {
       display: none;
     }
+    
+    /* Toast notification for image upload */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border-radius: 5px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      display: none;
+      z-index: 1000;
+      animation: fadeInOut 3s;
+    }
+    
+    @keyframes fadeInOut {
+      0% { opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { opacity: 0; }
+    }
   </style>
 </head>
 <body>
@@ -185,7 +207,7 @@
   <main class="profile-main-full">
     <section class="profile-header">
       <div class="avatar-container">
-        <img src="../assets/images/velma.jpg" alt="User Avatar" class="avatar"/>
+        <img src="../assets/images/velma.jpg" alt="User Avatar" class="avatar" id="profile-avatar"/>
         <label for="avatar-upload" class="change-avatar" title="Change Profile Picture">📷</label>
         <input type="file" id="avatar-upload" accept="image/*"/>
       </div>
@@ -237,5 +259,42 @@
       </form>
     </section>
   </main>
+  
+  <div class="toast" id="toast-notification">Profile picture updated successfully!</div>
+
+  <script>
+    // Add event listener to handle file selection
+    document.getElementById('avatar-upload').addEventListener('change', function(event) {
+      const file = event.target.files[0];
+      
+      if (file) {
+        // Create a FileReader to read the selected image
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+          // Update the profile image with the selected file
+          document.getElementById('profile-avatar').src = e.target.result;
+          
+          // Show success notification
+          showToast('Profile picture updated successfully!');
+        };
+        
+        // Read the image file as a data URL
+        reader.readAsDataURL(file);
+      }
+    });
+    
+    // Function to show toast notification
+    function showToast(message) {
+      const toast = document.getElementById('toast-notification');
+      toast.textContent = message;
+      toast.style.display = 'block';
+      
+      // Hide the toast after 3 seconds
+      setTimeout(function() {
+        toast.style.display = 'none';
+      }, 3000);
+    }
+  </script>
 </body>
 </html>
