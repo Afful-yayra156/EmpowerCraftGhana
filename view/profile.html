@@ -1,46 +1,210 @@
-.sidebar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 250px;
-  height: 100vh;
-  background-color: #1e4d2b;
-  color: white;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 3px 0 10px rgba(0,0,0,0.2);
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Profile | EmpowerCraft</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-.sidebar h2 {
-  font-size: 24px;
-  margin-bottom: 30px;
-}
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      min-height: 100vh;
+      background: linear-gradient(to right, #e9f5ec, #d0f0c0);
+    }
 
-.sidebar nav a {
-  display: block;
-  margin: 10px 0;
-  text-decoration: none;
-  color: white;
-  padding: 10px;
-  border-radius: 5px;
-  transition: background 0.3s ease, transform 0.2s ease;
-}
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 250px;
+      height: 100vh;
+      background-color: #1e4d2b;
+      color: white;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 3px 0 10px rgba(0,0,0,0.2);
+    }
 
-.sidebar nav a:hover {
-  background-color: rgba(255, 255, 255, 0.15);
-  transform: translateX(5px);
-}
+    .sidebar h2 {
+      font-size: 24px;
+      margin-bottom: 30px;
+    }
 
-/* The button styling that was mixed with sidebar styling */
-button {
-  background: linear-gradient(135deg, #4CAF50, #2196F3);
-  color: white;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
+    .sidebar nav a {
+      display: block;
+      margin: 10px 0;
+      text-decoration: none;
+      color: white;
+      padding: 10px;
+      border-radius: 5px;
+      transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .sidebar nav a:hover {
+      background-color: rgba(255, 255, 255, 0.15);
+      transform: translateX(5px);
+    }
+
+    .profile-main-full {
+      margin-left: 250px;
+      padding: 40px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+
+    .profile-header {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .avatar {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #3d7b50;
+    }
+
+    .profile-columns {
+      display: flex;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+
+    .profile-info, .edit-profile {
+      flex: 1;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      min-width: 300px;
+    }
+
+    .edit-profile form,
+    .reviews-comments form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    input, textarea {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+      background-color: rgba(249, 249, 249, 0.8);
+    }
+
+    button {
+      background: linear-gradient(135deg, #4CAF50, #2196F3);
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    button:hover {
+      background: linear-gradient(135deg, #45a049, #1e88e5);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    .reviews-comments {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .review {
+      margin-bottom: 15px;
+      padding: 10px;
+      background-color: #f6fdf8;
+      border-left: 5px solid #3d7b50;
+    }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <h2>EmpowerCraft</h2>
+    <nav>
+      <a href="dashboard.html">🏠 Dashboard</a>
+      <a href="profile.html" class="active">👤 My Profile</a>
+      <a href="#">💬 Messages</a>
+      <a href="#">⭐ Reviews</a>
+      <a href="#">⚙ Settings</a>
+      <a href="#">🚪 Logout</a>
+    </nav>
+  </aside>
+
+  <main class="profile-main-full">
+    <section class="profile-header">
+      <img src="assets/images/velma.jpg" alt="User Avatar" class="avatar"/>
+      <div>
+        <h1>User Full Name</h1>
+        <p>Artisan - Woodwork & Decor</p>
+      </div>
+    </section>
+
+    <div class="profile-columns">
+      <section class="profile-info">
+        <h2>About Me</h2>
+        <p>Hello! I'm a passionate wood artisan based in Accra. I create handmade furniture and offer repairs.</p>
+
+        <h2>Contact Info</h2>
+        <ul>
+          <li><strong>Email:</strong> user@email.com</li>
+          <li><strong>Phone:</strong> +233 24 000 0000</li>
+          <li><strong>Location:</strong> Kumasi, Ghana</li>
+        </ul>
+      </section>
+
+      <section class="edit-profile">
+        <h2>Edit Profile</h2>
+        <form>
+          <input type="text" placeholder="Full Name" value="User Full Name"/>
+          <input type="email" placeholder="Email" value="user@email.com"/>
+          <textarea placeholder="Bio">I'm a passionate wood artisan...</textarea>
+          <button type="submit">Save Changes</button>
+        </form>
+      </section>
+    </div>
+
+    <section class="reviews-comments">
+      <h2>Reviews</h2>
+      <div class="review">
+        <strong>Akwesi B. ⭐⭐⭐⭐⭐</strong>
+        <p>Excellent craftsmanship. Highly recommend!</p>
+      </div>
+      <div class="review">
+        <strong>Nana Yaa ⭐⭐⭐⭐</strong>
+        <p>Delivery took a bit long, but the product is great.</p>
+      </div>
+
+      <h3>Leave a Review</h3>
+      <form>
+        <textarea placeholder="Write your review here..."></textarea>
+        <button type="submit">Submit</button>
+      </form>
+    </section>
+  </main>
+</body>
+</html>
