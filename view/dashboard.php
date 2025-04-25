@@ -1,3 +1,190 @@
+<?php
+// Start session for user authentication
+session_start();
+
+// Check if user is logged in, if not redirect to login page
+if (!isset($_SESSION['user_id'])) {
+    header('Location: login.php');
+    exit();
+}
+
+// Include database configuration
+include '../db/config.php';
+
+// Get current user information
+$userId = $_SESSION['user_id'];
+$userName = $_SESSION['fname'];
+$userRole = $_SESSION['role'];
+
+// Initialize statistics variables
+$totalUsers = 0;
+$verifiedArtisans = 0;
+$completedTasks = 0;
+$satisfactionRate = 0;
+
+// Function to get dashboard statistics based on user role
+function getDashboardStats($conn, $userId, $userRole) {
+    $stats = [
+        'totalUsers' => 0,
+        'verifiedArtisans' => 0,
+        'completedTasks' => 0,
+        'satisfactionRate' => 0,
+        'pendingBookings' => 0,
+        'myListings' => 0,
+        'myServices' => 0,
+        'unreadMessages' => 0,
+        'recentReviews' => []
+    ];
+    
+    // Get total users count
+    $query = "SELECT COUNT(*) as count FROM users WHERE account_status = 'active'";
+    $result = $conn->query($query);
+    if ($result && $row = $result->fetch_assoc()) {
+        $stats['totalUsers'] = $row['count'];
+    }
+    
+    // Get verified artisans count
+    $query = "SELECT COUNT(*) as count FROM users WHERE user_type = 'artisan' AND is_verified = 1";
+    $result = $conn->query($query);
+    if ($result && $row = $result->fetch_assoc()) {
+        $stats['verifiedArtisans'] = $row['count'];
+    }
+    
+    // Get completed bookings/tasks count
+    $query = "SELECT COUNT(*) as count FROM bookings WHERE status = 'completed'";
+    $result = $conn->query($query);
+    if ($result && $row = $result->fetch_assoc()) {
+        $stats['completedTasks'] = $row['count'];
+    }
+    
+    // Calculate average satisfaction rate from completed bookings with reviews
+    $query = "SELECT AVG(r.rating) as avg_rating FROM reviews r 
+              JOIN bookings b ON r.reference_id = b.booking_id 
+              WHERE r.reference_type = 'service' AND b.status = 'completed'";
+    $result = $conn->query($query);
+    if ($result && $row = $result->fetch_assoc() && !is_null($row['avg_rating'])) {
+        $stats['satisfactionRate'] = round($row['avg_rating'] * 20, 1); // Convert 5-scale to percentage
+    } else {
+        $stats['satisfactionRate'] = 98; // Default value if no data
+    }
+    
+    // User-specific statistics
+    if ($userRole == 'artisan') {
+        // Get pending bookings for artisan
+        $query = "SELECT COUNT(*) as count FROM bookings WHERE artisan_id = ? AND status = 'pending'";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param('i', $userId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if ($row = $result->fetch_assoc()) {
+            $stats['pendingBookings'] = $row['count'];
+        }
+        $stmt->close();
+        
+        // Get artisan's services count
+        $query = "SELECT COUNT(*) as count FROM services WHERE user_id = ? AND status = 'active'";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param('i', $userId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if ($row = $result->fetch_assoc()) {
+            $stats['myServices'] = $row['count'];
+        }
+        $stmt->close();
+        
+        // Get artisan's listings count
+        $query = "SELECT COUNT(*) as count FROM listings WHERE user_id = ? AND status = 'active'";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param('i', $userId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if ($row = $result->fetch_assoc()) {
+            $stats['myListings'] = $row['count'];
+        }
+        $stmt->close();
+    } elseif ($userRole == 'client') {
+        // Get pending bookings for client
+        $query = "SELECT COUNT(*) as count FROM bookings WHERE client_id = ? AND status = 'pending'";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param('i', $userId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if ($row = $result->fetch_assoc()) {
+            $stats['pendingBookings'] = $row['count'];
+        }
+        $stmt->close();
+    }
+    
+    // Get unread messages count
+    $query = "SELECT COUNT(*) as count FROM messages WHERE receiver_id = ? AND is_read = 0";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param('i', $userId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($row = $result->fetch_assoc()) {
+        $stats['unreadMessages'] = $row['count'];
+    }
+    $stmt->close();
+    
+    // Get recent reviews (either by or for the user)
+    if ($userRole == 'artisan') {
+        $query = "SELECT r.review_id, r.rating, r.comment, r.creation_date, 
+                 u.first_name, u.last_name 
+                 FROM reviews r
+                 JOIN users u ON r.reviewer_id = u.user_id
+                 WHERE r.reviewed_id = ? 
+                 ORDER BY r.creation_date DESC LIMIT 3";
+    } else {
+        $query = "SELECT r.review_id, r.rating, r.comment, r.creation_date, 
+                 u.first_name, u.last_name 
+                 FROM reviews r
+                 JOIN users u ON r.reviewed_id = u.user_id
+                 WHERE r.reviewer_id = ? 
+                 ORDER BY r.creation_date DESC LIMIT 3";
+    }
+    
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param('i', $userId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    while ($row = $result->fetch_assoc()) {
+        $stats['recentReviews'][] = $row;
+    }
+    $stmt->close();
+    
+    return $stats;
+}
+
+// Get user-specific dashboard data
+$dashboardStats = getDashboardStats($conn, $userId, $userRole);
+
+// Get system announcements
+function getAnnouncements($conn) {
+    $announcements = [];
+    
+    // In a real implementation, you'd fetch from an announcements table
+    // For now, returning static data
+    $announcements[] = [
+        'title' => 'System Expansion',
+        'content' => '🎉 EmpowerCraft is expanding! We\'re rolling out our services to two new regions. Stay tuned for more features and events coming your way this quarter.',
+        'date' => date('Y-m-d')
+    ];
+    
+    return $announcements;
+}
+
+$announcements = getAnnouncements($conn);
+
+// Update last_login timestamp
+$updateStmt = $conn->prepare('UPDATE users SET last_login = NOW() WHERE user_id = ?');
+$updateStmt->bind_param('i', $userId);
+$updateStmt->execute();
+$updateStmt->close();
+
+// Close the database connection
+$conn->close();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -51,6 +238,18 @@
       background-color: rgba(255, 255, 255, 0.2);
     }
 
+    .user-info {
+      margin-bottom: 20px;
+      padding: 15px 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.3);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .user-info p {
+      margin: 5px 0;
+      font-size: 14px;
+    }
+
     .dashboard-main {
       margin-left: 250px;
       padding: 40px;
@@ -89,10 +288,51 @@
       color: #333;
     }
 
+    .notification-badge {
+      display: inline-block;
+      background-color: #ff4757;
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      text-align: center;
+      font-size: 12px;
+      line-height: 20px;
+      margin-left: 5px;
+    }
+
     .icon {
       font-size: 30px;
       margin-bottom: 10px;
       display: block;
+    }
+
+    .stat-box {
+      display: flex;
+      justify-content: space-between;
+      margin: 10px 0;
+      padding: 10px;
+      background-color: rgba(76, 175, 80, 0.1);
+      border-radius: 5px;
+    }
+
+    .stat-label {
+      font-weight: bold;
+    }
+
+    .review-item {
+      margin-bottom: 15px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .review-item .rating {
+      color: #FFC107;
+    }
+
+    .review-item .review-date {
+      font-size: 12px;
+      color: #777;
     }
 
     /* Floating decorative elements */
@@ -149,13 +389,38 @@
 <body>
   <aside class="sidebar">
     <h2>EmpowerCraft</h2>
+    
+    <div class="user-info">
+      <p>Welcome, <?php echo htmlspecialchars($userName); ?>!</p>
+      <p>Role: <?php echo ucfirst(htmlspecialchars($userRole)); ?></p>
+    </div>
+    
     <nav>
       <a href="dashboard.php">🏠 Dashboard</a>
-      <a href="profile.html">👤 My Profile</a>
-      <a href="#">💬 Messages</a>
-      <a href="#">⭐ Reviews</a>
-      <a href="#">⚙ Settings</a>
-      <a href="#">🚪 Logout</a>
+      <a href="profile.php">👤 My Profile</a>
+      <a href="messages.php">💬 Messages 
+        <?php if($dashboardStats['unreadMessages'] > 0): ?>
+          <span class="notification-badge"><?php echo $dashboardStats['unreadMessages']; ?></span>
+        <?php endif; ?>
+      </a>
+      <?php if($userRole == 'artisan'): ?>
+        <a href="services.php">🛠️ My Services</a>
+        <a href="bookings.php">📅 Bookings
+          <?php if($dashboardStats['pendingBookings'] > 0): ?>
+            <span class="notification-badge"><?php echo $dashboardStats['pendingBookings']; ?></span>
+          <?php endif; ?>
+        </a>
+      <?php elseif($userRole == 'client'): ?>
+        <a href="find-services.php">🔍 Find Services</a>
+        <a href="my-bookings.php">📅 My Bookings
+          <?php if($dashboardStats['pendingBookings'] > 0): ?>
+            <span class="notification-badge"><?php echo $dashboardStats['pendingBookings']; ?></span>
+          <?php endif; ?>
+        </a>
+      <?php endif; ?>
+      <a href="reviews.php">⭐ Reviews</a>
+      <a href="settings.php">⚙ Settings</a>
+      <a href="logout.php">🚪 Logout</a>
     </nav>
   </aside>
 
@@ -169,37 +434,106 @@
     <section class="dashboard-card">
       <span class="icon">👥</span>
       <h2>Welcome to EmpowerCraft</h2>
-      <p>This dashboard provides a snapshot of user activity and system statistics. EmpowerCraft is dedicated to connecting skilled individuals with those in need of their expertise, creating opportunities for artisans and making services accessible.</p>
+      <p>This dashboard provides a snapshot of your activity and system statistics. EmpowerCraft is dedicated to connecting skilled individuals with those in need of their expertise, creating opportunities for artisans and making services accessible.</p>
     </section>
 
     <section class="dashboard-card">
       <span class="icon">📈</span>
-      <h2>Statistics Overview</h2>
-      <p>We currently have over <strong>1,200 active users</strong> and <strong>320 verified artisans</strong> registered on the platform. Monthly traffic has increased by <strong>25%</strong> since our last update.</p>
+      <h2>Platform Statistics</h2>
+      <div class="stat-box">
+        <span class="stat-label">Active Users:</span>
+        <span class="stat-value"><?php echo number_format($dashboardStats['totalUsers']); ?></span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">Verified Artisans:</span>
+        <span class="stat-value"><?php echo number_format($dashboardStats['verifiedArtisans']); ?></span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">Completed Tasks:</span>
+        <span class="stat-value"><?php echo number_format($dashboardStats['completedTasks']); ?></span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">Satisfaction Rate:</span>
+        <span class="stat-value"><?php echo $dashboardStats['satisfactionRate']; ?>%</span>
+      </div>
     </section>
 
+    <?php if($userRole == 'artisan'): ?>
     <section class="dashboard-card">
       <span class="icon">🛠</span>
-      <h2>Artisan Performance</h2>
-      <p>Our top-rated artisans have completed more than <strong>3,000 tasks</strong> combined. Feedback shows a <strong>98% satisfaction rate</strong>, reflecting our commitment to quality service.</p>
+      <h2>My Services & Listings</h2>
+      <div class="stat-box">
+        <span class="stat-label">Active Services:</span>
+        <span class="stat-value"><?php echo $dashboardStats['myServices']; ?></span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">Active Listings:</span>
+        <span class="stat-value"><?php echo $dashboardStats['myListings']; ?></span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-label">Pending Bookings:</span>
+        <span class="stat-value"><?php echo $dashboardStats['pendingBookings']; ?></span>
+      </div>
+      <p><a href="services.php" style="color: #4CAF50; text-decoration: none;">Manage your services →</a></p>
     </section>
-
+    <?php elseif($userRole == 'client'): ?>
     <section class="dashboard-card">
       <span class="icon">📝</span>
-      <h2>Latest Updates</h2>
-      <p>New features include a direct messaging system, advanced booking tools, and improved profile customization. We're constantly working to enhance user experience on EmpowerCraft.</p>
+      <h2>My Bookings</h2>
+      <div class="stat-box">
+        <span class="stat-label">Pending Bookings:</span>
+        <span class="stat-value"><?php echo $dashboardStats['pendingBookings']; ?></span>
+      </div>
+      <p><a href="my-bookings.php" style="color: #4CAF50; text-decoration: none;">View all bookings →</a></p>
+    </section>
+    <?php endif; ?>
+
+    <section class="dashboard-card">
+      <span class="icon">💬</span>
+      <h2>Messages</h2>
+      <?php if($dashboardStats['unreadMessages'] > 0): ?>
+        <p>You have <strong><?php echo $dashboardStats['unreadMessages']; ?> unread message(s)</strong>.</p>
+      <?php else: ?>
+        <p>You have no unread messages.</p>
+      <?php endif; ?>
+      <p><a href="messages.php" style="color: #4CAF50; text-decoration: none;">Go to inbox →</a></p>
     </section>
 
     <section class="dashboard-card">
-      <span class="icon">🔒</span>
-      <h2>Security & Privacy</h2>
-      <p>Your information is protected by end-to-end encryption. We follow strict data protection regulations to ensure privacy and confidentiality across all user interactions.</p>
+      <span class="icon">⭐</span>
+      <h2>Recent Reviews</h2>
+      <?php if(empty($dashboardStats['recentReviews'])): ?>
+        <p>No reviews available yet.</p>
+      <?php else: ?>
+        <?php foreach($dashboardStats['recentReviews'] as $review): ?>
+          <div class="review-item">
+            <div class="rating">
+              <?php for($i = 0; $i < 5; $i++): ?>
+                <?php if($i < floor($review['rating'])): ?>
+                  ★
+                <?php else: ?>
+                  ☆
+                <?php endif; ?>
+              <?php endfor; ?>
+            </div>
+            <p>"<?php echo htmlspecialchars(substr($review['comment'], 0, 100)); ?>..."</p>
+            <p class="review-date">By <?php echo htmlspecialchars($review['first_name'] . ' ' . $review['last_name']); ?> on <?php echo date('M d, Y', strtotime($review['creation_date'])); ?></p>
+          </div>
+        <?php endforeach; ?>
+        <p><a href="reviews.php" style="color: #4CAF50; text-decoration: none;">View all reviews →</a></p>
+      <?php endif; ?>
     </section>
 
     <section class="dashboard-card">
       <span class="icon">📢</span>
       <h2>Announcements</h2>
-      <p>🎉 EmpowerCraft is expanding! We're rolling out our services to two new regions. Stay tuned for more features and events coming your way this quarter.</p>
+      <?php foreach($announcements as $announcement): ?>
+        <div class="announcement-item">
+          <h3><?php echo htmlspecialchars($announcement['title']); ?></h3>
+          <p><?php echo $announcement['content']; ?></p>
+          <p class="announcement-date">Posted on: <?php echo date('M d, Y', strtotime($announcement['date'])); ?></p>
+        </div>
+      <?php endforeach; ?>
     </section>
   </main>
 </body>
