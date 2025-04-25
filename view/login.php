@@ -1,35 +1,140 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Login | EmpowerCraft Ghana</title>
     <link rel="stylesheet" href="../assets/css/login.css">
-    <title>Login | EmpowerSkills Ghana</title>
+ 
 </head>
-
 <body>
+    <header>
+        <div class="header-content">
+            <div class="header-logo">
+                <div class="header-logo-icon">
+                    <span>E</span>
+                </div>
+                <div class="header-title">EmpowerCraft Ghana</div>
+            </div>
+            <nav class="header-nav">
+                <a href="../index.html">Home</a>
+                <a href="signup.php">Sign Up</a>
+            </nav>
+        </div>
+    </header>
 
-    <!-- Login Form Container -->
-    <div class="container">
-        <h2>Login</h2>
-        <!-- Login form that triggers validation on submit -->
-        <form id="loginForm" action="../actions/login_process.php" method="post" onsubmit="return formvalidate()">
-            <input type="email" id="email" name="email" placeholder="Email" required>
-            <input type="password" id="password" name="password" placeholder="Password" required>
+    <div class="main-content">
+        <div class="login-container">
+            <div class="brand-section">
+                <div class="brand-logo">
+                    <span>E</span>
+                </div>
+                <h1>EmpowerCraft Ghana</h1>
+                <p>Building better futures through skills development and education. Join our community today.</p>
+            </div>
 
-            <!-- Error messages for invalid input -->
-            <span id="passwordError" style="color:rgb(255, 3, 3);"></span><br><br>
-            <div id="loginError" style="color: red;"></div>
-            <div id="loginSuccess" style="color: green;"></div>
-            
-            <!-- Submit button for the form -->
-            <button type="submit">Login</button>
-        </form>
-        
-        <!-- Link to Signup page if user doesn't have an account -->
-        <a href="signup.php">Don't have an account? Sign Up</a>
+            <div class="form-section">
+                <h2>Welcome Back</h2>
+                <div id="statusMessage"></div>
+                <form id="loginForm" action="../actions/login_process.php" method="post" onsubmit="return formvalidate()">
+                    <div class="input-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" placeholder="your@email.com" required>
+                    </div>
+                                        <!-- Error messages for invalid input -->
+                    <span id="passwordError" style="color:rgb(255, 3, 3);"></span><br><br>
+                    <div id="loginError" style="color: red;"></div>
+                    <div id="loginSuccess" style="color: green;"></div>
+                    <div class="input-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" placeholder="••••••••" required>
+                    </div>
+
+                    <div class="forgot-password">
+                        <a href="#">Forgot password?</a>
+                    </div>
+
+                    <button type="submit" class="login-button">Log In</button>
+
+                    <div class="signup-link">
+                        Don't have an account? <a href="signup.php">Sign Up</a>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 
+    <footer>
+        <div class="footer-content">
+            <div class="footer-column">
+                <h3>About Us</h3>
+                <p>EmpowerCraft Ghana connects skilled professionals with clients looking for their services.</p>
+            </div>
+
+            <div class="footer-column">
+                <h3>Contact Us</h3>
+                <p>1 University Avenue, Accra, Ghana</p>
+                <p>Email: empowerCraft@gmail.com</p>
+            </div>
+        </div>
+        <div class="copyright">
+            <p>&copy; 2025 EmpowerCraft Ghana. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- <script>
+        function initializeSampleUser() {
+            if (!localStorage.getItem("userData")) {
+                const sampleUser = {
+                    name: "Test User",
+                    email: "you@example.com",
+                    password: "password123"
+                };
+                localStorage.setItem("userData", JSON.stringify(sampleUser));
+                console.log("Sample user created for testing");
+            }
+        }
+
+        initializeSampleUser();
+
+        function showStatus(message, type) {
+            const statusElement = document.getElementById("statusMessage");
+            statusElement.textContent = message;
+            statusElement.className = type;
+            statusElement.style.display = "block";
+
+            if (type === "success") {
+                setTimeout(() => {
+                    statusElement.style.display = "none";
+                }, 3000);
+            }
+        }
+
+        document.getElementById("loginForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            let email = document.getElementById("email").value;
+            let password = document.getElementById("password").value;
+
+            let storedUser = localStorage.getItem("userData");
+            if (!storedUser) {
+                showStatus("No user found. Please sign up.", "error");
+                return;
+            }
+
+            let userData = JSON.parse(storedUser);
+
+            if (userData.email === email && userData.password === password) {
+                showStatus("Login successful! Redirecting to dashboard...", "success");
+                localStorage.setItem("loggedInUser", JSON.stringify(userData));
+                setTimeout(() => {
+                    window.location.href = "dashboard.php";
+                }, 1500);
+            } else {
+                showStatus("Incorrect email or password!", "error");
+            }
+        });
+    </script> -->
     <!-- Form Validation Script -->
     <script>
         function formvalidate() {

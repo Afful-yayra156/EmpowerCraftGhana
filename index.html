@@ -1,28 +1,350 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href = "assets/css/index.css">
-    <title>EmpowergitSkills Ghana</title>
-    
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>EmpowerCraft Ghana</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        header {
+            background: linear-gradient(135deg, #43cea2, #185a9d);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+        }
+
+        nav ul li {
+            margin-left: 20px;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.3s;
+        }
+
+        nav ul li a:hover {
+            opacity: 0.85;
+        }
+
+        /* Updated hero section with slideshow */
+        .hero {
+            position: relative;
+            height: 80vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .slideshow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-position: center;
+            background-size: cover;
+            opacity: 0;
+            /* Reduced transition time from 1.5s to 0.8s for faster fading */
+            transition: opacity 0.8s ease-in-out;
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        .hero-content {
+            background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 600px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            z-index: 1;
+        }
+
+        .hero-content h1 {
+            color: white;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .hero-content p {
+            color: white;
+            font-size: 1.1em;
+            margin-bottom: 25px;
+        }
+
+        .btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 14px 28px;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.3s ease;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+        }
+
+        .about {
+            padding: 60px 20px;
+            background-color: white;
+            color: #333;
+            text-align: center;
+        }
+
+        .about h2 {
+            color: #185a9d;
+            font-size: 2.2em;
+            margin-bottom: 20px;
+        }
+
+        .about p {
+            font-size: 1.1em;
+            max-width: 900px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+
+        footer {
+            background: linear-gradient(135deg, #4CAF50, #2196F3);
+            color: white;
+            padding: 30px 0;
+            width: 100%;
+        }
+
+        .footer-content {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        .footer-column {
+            flex: 1;
+            min-width: 250px;
+            margin-bottom: 20px;
+        }
+
+        .footer-column h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            position: relative;
+            padding-bottom: 8px;
+        }
+
+        .footer-column h3::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 30px;
+            height: 2px;
+            background-color: white;
+        }
+
+        .footer-column p, .footer-column ul {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .footer-column ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-column ul li {
+            margin-bottom: 8px;
+        }
+
+        .footer-column ul li a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-column ul li a:hover {
+            color: #e3f2fd;
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 15px;
+            margin-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            nav ul {
+                flex-direction: column;
+                margin-top: 10px;
+            }
+
+            nav ul li {
+                margin: 10px 0;
+            }
+
+            .hero-content h1 {
+                font-size: 1.8em;
+            }
+            
+            .hero-content {
+                padding: 20px;
+            }
+
+            .about h2 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
 </head>
 <body>
-    <nav>
-        <h1>EmpowerSkills Ghana</h1>
-        <ul>
-            <li><a href="./view/services.html">Services</a></li>
-            <li><a href="./view/courses.html">Courses</a></li>
-            <li><a href="./view/checkout.html">Checkout</a></li>
-            <li><a href="./view/login.php">Login</a></li>
-            <li><a href="./view/signup.php">Sign Up</a></li>
-        </ul>
-    </nav>
 
+    <!-- Header & Nav -->
+    <header>
+        <div class="nav-container">
+            <div class="logo">EmpowerCraft Ghana</div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="view/login.html">Login</a></li>
+                    <li><a href="view/signup.php">Sign Up</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Updated Hero Section with Slideshow -->
     <section class="hero">
-        <h2>Showcase, Sell & Monetize Your Skills</h2>
-        <p>Join the largest digital platform for artisans and tutors in Ghana .</p>
-        <a href="./view/signup.php" class="btn">Get Started</a>
+        <div class="slideshow">
+            <div class="slide active" style="background-image: url('assets/images/arts.jpg');"></div>
+            <div class="slide" style="background-image: url('assets/images/craft.jpg');"></div>
+            <div class="slide" style="background-image: url('assets/images/ar.jpg');"></div>
+            <div class="slide" style="background-image: url('assets/images/carpenter.jpg');"></div>
+            <div class="slide" style="background-image: url('assets/images/plumber.jpg');"></div>
+            <div class="slide" style="background-image: url('assets/images/teacher.jpg');"></div>
+            <div class="slide" style="background-image: url('assets/images/hair.jpg');"></div>
+            <div class="slide" style="background-image: url('assets/images/painter.jpg');"></div>
+            <div class="slide" style="background-image: url('assets/images/css.jpg');"></div>
+            <div class="slide" style="background-image: url('assets/images/craftt.jpg');"></div>
+            <div class="slide" style="background-image: url('assets/images/cs.jpg');"></div>
+            <div class="slide" style="background-image: url('assets/images/arttt.jpg');"></div>
+            <div class="slide" style="background-image: url('assets/images/artist.jpg');"></div>
+        </div>
+        <div class="hero-content">
+            <h1>Showcase, Sell & Monetize Your Skills</h1>
+            <p>Join Ghana's largest digital hub for artisans, creatives, and tutors. Empower yourself, build your brand, and connect with clients across the nation.</p>
+            <a href="view/signup.php" class="btn">Get Started</a>
+        </div>
     </section>
+
+    <!-- About Section -->
+    <section class="about">
+        <h2>What is EmpowerCraft Ghana?</h2>
+        <p>
+            EmpowerCraft Ghana is a transformative digital platform built to empower artisans, skilled professionals, and educators. 
+            Our goal is to help people like you showcase talents, sell services, and reach a wider audience — all from the comfort of your phone or laptop. 
+            Whether you're a fashion designer, painter, welder, tutor, or tech trainer, this platform provides visibility, tools, and connections to grow your craft and career. 
+            We're here to support local talent and create economic opportunities for everyone.
+        </p>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-column">
+                <h3>About Us</h3>
+                <p>EmpowerCraft Ghana helps skilled individuals and educators connect </p>
+                <p>with clients and grow their businesses through our digital platform.</p>
+            </div>
+
+            <div class="footer-column">
+                <h3>Contact Us</h3>
+                <p>1 University Avenue, Accra, Ghana</p>
+                <p>Email: empowerCraft@gmail.com</p>
+            </div>
+        </div>
+        <div class="copyright">
+            <p>&copy; 2025 EmpowerCraft Ghana. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript for Slideshow -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const slides = document.querySelectorAll('.slide');
+            let currentSlide = 0;
+            
+            function nextSlide() {
+                // Remove active class from current slide
+                slides[currentSlide].classList.remove('active');
+                
+                // Update current slide index
+                currentSlide = (currentSlide + 1) % slides.length;
+                
+                // Add active class to new current slide
+                slides[currentSlide].classList.add('active');
+            }
+            
+            // Change slide every 3 seconds (reduced from 5 seconds)
+            setInterval(nextSlide, 3000);
+        });
+    </script>
+
 </body>
 </html>
