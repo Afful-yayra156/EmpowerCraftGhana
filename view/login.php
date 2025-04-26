@@ -37,17 +37,29 @@
                 <h2>Welcome Back</h2>
                 <div id="statusMessage"></div>
                 <form id="loginForm" action="../actions/login_process.php" method="post" onsubmit="return formvalidate()">
+
+                    <div class="errorMessage">
+                        <span id="passwordError"></span><br>
+                        <div id="loginError"></div>
+                        <div id="loginSuccess"></div>
+                        <?php
+                        session_start();
+                        if (isset($_SESSION['login_error'])) {
+                            echo '<span id="passwordError" style="color: red;">' . $_SESSION['login_error'] . '</span>';
+                            unset($_SESSION['login_error']); // Clear the error after showing it
+                        }
+                        ?>
+                    </div>
+
+
                     <div class="input-group">
                         <label for="email">Email Address</label>
                         <input type="email" id="email" name="email" placeholder="your@email.com" required>
                     </div>
-                                        <!-- Error messages for invalid input -->
-                    <span id="passwordError" style="color:rgb(255, 3, 3);"></span><br><br>
-                    <div id="loginError" style="color: red;"></div>
-                    <div id="loginSuccess" style="color: green;"></div>
+                    
                     <div class="input-group">
                         <label for="password">Password</label>
-                        <input type="password" id="password" name="password" placeholder="••••••••" required>
+                        <input type="password" id="password" name="password" placeholder="******" required>
                     </div>
 
                     <div class="forgot-password">
@@ -82,60 +94,7 @@
         </div>
     </footer>
 
-    <!-- <script>
-        function initializeSampleUser() {
-            if (!localStorage.getItem("userData")) {
-                const sampleUser = {
-                    name: "Test User",
-                    email: "you@example.com",
-                    password: "password123"
-                };
-                localStorage.setItem("userData", JSON.stringify(sampleUser));
-                console.log("Sample user created for testing");
-            }
-        }
 
-        initializeSampleUser();
-
-        function showStatus(message, type) {
-            const statusElement = document.getElementById("statusMessage");
-            statusElement.textContent = message;
-            statusElement.className = type;
-            statusElement.style.display = "block";
-
-            if (type === "success") {
-                setTimeout(() => {
-                    statusElement.style.display = "none";
-                }, 3000);
-            }
-        }
-
-        document.getElementById("loginForm").addEventListener("submit", function(event) {
-            event.preventDefault();
-
-            let email = document.getElementById("email").value;
-            let password = document.getElementById("password").value;
-
-            let storedUser = localStorage.getItem("userData");
-            if (!storedUser) {
-                showStatus("No user found. Please sign up.", "error");
-                return;
-            }
-
-            let userData = JSON.parse(storedUser);
-
-            if (userData.email === email && userData.password === password) {
-                showStatus("Login successful! Redirecting to dashboard...", "success");
-                localStorage.setItem("loggedInUser", JSON.stringify(userData));
-                setTimeout(() => {
-                    window.location.href = "dashboard.php";
-                }, 1500);
-            } else {
-                showStatus("Incorrect email or password!", "error");
-            }
-        });
-    </script> -->
-    <!-- Form Validation Script -->
     <script>
         function formvalidate() {
             var email = document.getElementById("email").value;
