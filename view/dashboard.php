@@ -152,7 +152,7 @@
     <nav>
       <a href="dashboard.php">🏠 Dashboard</a>
       <a href="profile.html">👤 My Profile</a>
-      <a href="#">💬 Messages</a>
+      <a href="services.php"> 👤Services</a>
       <a href="#">⭐ Reviews</a>
       <a href="#">⚙ Settings</a>
       <a href="#">🚪 Logout</a>

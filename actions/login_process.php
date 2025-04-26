@@ -12,6 +12,7 @@ session_start();
 
 // Check if the form was submitted via POST
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+
     // Ensure email and password are provided
     if (!empty($_POST['email']) && !empty($_POST['password'])) {
         $email = trim($_POST['email']);
@@ -37,29 +38,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                 // Redirect to the dashboard
                 header('Location: ../view/dashboard.php');
-                exit(); // Ensure script execution stops after redirection
+                exit();
             } else {
-                // Incorrect password error message
-                echo '<script>alert("Incorrect password. Please try again.");</script>';
-                echo '<script>window.location.href = "../view/login.php";</script>';
+                // If password is incorrect, pass an error message to the login page
+                $_SESSION['login_error'] = 'Incorrect password. Please try again.';
+                header('Location: ../view/login.php');
                 exit();
             }
         } else {
-            // Email not found in the database
-            echo '<script>alert("Email not found. Please register first.");</script>';
-            echo '<script>window.location.href = "../view/signup.php";</script>';
+            // If no user found, pass an error message
+            $_SESSION['login_error'] = 'No user found with that email.';
+            header('Location: ../view/login.php');
             exit();
         }
-
-        $stmt->close(); // Close prepared statement
-    } else {
-        // Handle missing form data
-        echo '<script>alert("Form data missing. Please try again.");</script>';
-        echo '<script>window.location.href = "../view/login.php";</script>';
-        exit();
     }
+    $stmt->close();
+    $conn->close();
 }
-
-// Close database connection
-$conn->close();
 ?>

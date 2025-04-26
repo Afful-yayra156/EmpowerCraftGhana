@@ -141,6 +141,13 @@
             -webkit-text-fill-color: transparent;
         }
 
+        .form-section .errorMessage {
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            color : red;
+
+        }
+
         .form-section {
             width: 50%;
             background-color: white;
