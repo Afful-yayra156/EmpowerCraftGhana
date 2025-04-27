@@ -1,3 +1,51 @@
+
+<?php
+session_start();
+include '../db/config.php'; 
+
+if (!isset($_SESSION['fname'])) {
+    header('Location: login.php');
+    exit();
+}
+
+$userRole = $_SESSION['role'];
+
+$sql_users = "SELECT COUNT(*) AS total_users FROM users";
+$result_users = $conn->query($sql_users);
+
+$totalUsers = 0; // Default to 0 if no users found
+if ($result_users && $row_users = $result_users->fetch_assoc()) {
+    $totalUsers = $row_users['total_users'];
+}
+
+// Query to get total reviews count for calculating the percentage
+$query_total_reviews = "SELECT COUNT(*) AS total_reviews FROM reviews";
+$result_total_reviews = $conn->query($query_total_reviews);
+
+if ($result_total_reviews && $row_total_reviews = $result_total_reviews->fetch_assoc()) {
+    $totalReviews = $row_total_reviews['total_reviews'];
+}
+
+
+// Query to get the total number of bookings
+$sql_bookings = "SELECT COUNT(*) AS total_bookings FROM bookings"; 
+$result_bookings = $conn->query($sql_bookings);
+
+$totalBookings = 0; // Default to 0 if no bookings found
+if ($result_bookings && $row_bookings = $result_bookings->fetch_assoc()) {
+    $totalBookings = $row_bookings['total_bookings'];
+}
+
+$sql_count = "SELECT COUNT(*) AS total_services FROM services";
+$result_count = $conn->query($sql_count);
+
+$total_services = 0; // Default to 0 if no services found
+if ($result_count && $row_count = $result_count->fetch_assoc()) {
+    $total_services = $row_count['total_services'];
+}
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,373 +53,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>User Dashboard | EmpowerCraft</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+  <link rel ="stylesheet" href = "../assets/css/dashboard.css">
 
-    body {
-      font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f8fafc;
-      display: flex;
-      color: #334155;
-    }
-
-    .sidebar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 280px;
-      height: 100vh;
-      background: linear-gradient(135deg, #4CAF50, #2196F3);
-      color: white;
-      padding: 24px;
-      box-shadow: 4px 0 20px rgba(0,0,0,0.1);
-      z-index: 10;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 40px;
-    }
-
-    .logo-icon {
-      font-size: 30px;
-    }
-
-    .sidebar h2 {
-      font-size: 24px;
-      font-weight: 600;
-    }
-
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin: 8px 0;
-      text-decoration: none;
-      color: white;
-      padding: 14px 18px;
-      border-radius: 12px;
-      transition: all 0.3s ease;
-      font-weight: 500;
-    }
-
-    .nav-item:hover {
-      background-color: rgba(255, 255, 255, 0.2);
-      transform: translateX(5px);
-    }
-
-    .nav-item.active {
-      background-color: rgba(255, 255, 255, 0.3);
-    }
-
-    .main {
-      margin-left: 280px;
-      padding: 40px;
-      width: calc(100% - 280px);
-    }
-
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 40px;
-    }
-
-    .header-left h1 {
-      font-size: 32px;
-      color: #1e293b;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
-    .header-left p {
-      font-size: 16px;
-      color: #64748b;
-    }
-
-    .user-profile {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      background-color: white;
-      padding: 10px 20px;
-      border-radius: 50px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    }
-
-    .avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background-color: #4CAF50;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-weight: 600;
-    }
-
-    .notification-bell {
-      position: relative;
-      cursor: pointer;
-    }
-
-    .notification-badge {
-      position: absolute;
-      top: -5px;
-      right: -5px;
-      background-color: #ff5722;
-      color: white;
-      border-radius: 50%;
-      width: 20px;
-      height: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-    }
-
-    .summary {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 24px;
-      margin-bottom: 40px;
-    }
-
-    .summary-box {
-      background: white;
-      padding: 24px;
-      border-radius: 16px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-      transition: transform 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .summary-box:hover {
-      transform: translateY(-5px);
-    }
-
-    .summary-box h3 {
-      font-size: 16px;
-      color: #64748b;
-      margin-bottom: 12px;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .summary-box p {
-      font-size: 28px;
-      font-weight: 700;
-      color: #0f766e;
-    }
-
-    .summary-box .trend {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 14px;
-      margin-top: 8px;
-      color: #10b981;
-    }
-
-    .trend.down {
-      color: #ef4444;
-    }
-
-    .decoration-shape {
-      position: absolute;
-      bottom: -15px;
-      right: -15px;
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      background-color: rgba(76, 175, 80, 0.1);
-      z-index: 0;
-    }
-
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 24px;
-    }
-
-    .messages-section, .upcoming-section {
-      background: white;
-      border-radius: 16px;
-      padding: 24px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-    }
-
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-
-    .section-header h2 {
-      font-size: 20px;
-      font-weight: 600;
-      color: #1e293b;
-    }
-
-    .section-header a {
-      color: #4CAF50;
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: 500;
-    }
-
-    .message {
-      padding: 16px;
-      background: #f1f5f9;
-      border-radius: 12px;
-      margin-bottom: 16px;
-      transition: transform 0.2s ease;
-      border-left: 4px solid #4CAF50;
-      display: flex;
-      gap: 16px;
-    }
-
-    .message:hover {
-      transform: scale(1.02);
-    }
-
-    .message-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: rgba(76, 175, 80, 0.2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #4CAF50;
-    }
-
-    .message-content {
-      flex: 1;
-    }
-
-    .message-content h4 {
-      font-size: 16px;
-      margin-bottom: 5px;
-      font-weight: 500;
-    }
-
-    .message-content p {
-      font-size: 14px;
-      color: #64748b;
-    }
-
-    .message-time {
-      font-size: 12px;
-      color: #94a3b8;
-      margin-top: 5px;
-    }
-
-    .upcoming-event {
-      display: flex;
-      align-items: center;
-      padding: 16px;
-      border-radius: 12px;
-      background: #f1f5f9;
-      margin-bottom: 16px;
-      transition: all 0.2s ease;
-      border-left: 4px solid #2196F3;
-    }
-
-    .upcoming-event:hover {
-      transform: translateX(5px);
-    }
-
-    .event-date {
-      width: 50px;
-      height: 50px;
-      background: #2196F3;
-      color: white;
-      border-radius: 12px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      margin-right: 16px;
-    }
-
-    .event-date .day {
-      font-size: 18px;
-      font-weight: 700;
-    }
-
-    .event-date .month {
-      font-size: 12px;
-    }
-
-    .event-details h4 {
-      font-size: 16px;
-      margin-bottom: 5px;
-      font-weight: 500;
-    }
-
-    .event-details p {
-      font-size: 14px;
-      color: #64748b;
-    }
-
-    .floating-emoji {
-      position: absolute;
-      animation: float 6s ease-in-out infinite;
-      opacity: 0.5;
-      font-size: 24px;
-      z-index: -1;
-    }
-
-    @keyframes float {
-      0% {
-        transform: translateY(0px) rotate(0deg);
-      }
-      50% {
-        transform: translateY(-20px) rotate(10deg);
-      }
-      100% {
-        transform: translateY(0px) rotate(0deg);
-      }
-    }
-
-    @media (max-width: 992px) {
-      .dashboard-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    @media (max-width: 768px) {
-      .sidebar {
-        width: 70px;
-        padding: 20px 10px;
-      }
-      
-      .sidebar h2, .nav-text {
-        display: none;
-      }
-      
-      .logo {
-        justify-content: center;
-      }
-      
-      .main {
-        margin-left: 70px;
-        width: calc(100% - 70px);
-      }
-    }
-  </style>
 </head>
 <body>
   <!-- Floating emojis -->
@@ -422,10 +105,11 @@
     </nav>
   </aside>
 
+
   <main class="main">
     <section class="header">
       <div class="header-left">
-        <h1>Welcome back, Kwame</h1>
+        <h1>Welcome back, <?php echo htmlspecialchars($_SESSION['fname']); ?></h1>
         <p>Here's what's happening with your craft business</p>
       </div>
       <div class="user-profile">
@@ -438,9 +122,20 @@
     </section>
 
     <section class="summary">
+
+    <div class="summary-box">
+     <?php if ($userRole == 'admin') { ?>
+        <h3><i class="fas fa-box-open"></i> Total Users </h3>
+        <p><?php echo $totalUsers; ?></p>
+        <div class="trend">
+          <i class="fas fa-arrow-up"></i> 
+          <span>Users</span>
+        </div>
+        <div class="decoration-shape"></div>
+      </div>
       <div class="summary-box">
-        <h3><i class="fas fa-box-open"></i> Total Services</h3>
-        <p>12</p>
+        <h3><i class="fas fa-box-open"></i> Total Services </h3>
+        <p><?php echo $total_services; ?></p>
         <div class="trend">
           <i class="fas fa-arrow-up"></i> 
           <span>+3 this month</span>
@@ -449,7 +144,7 @@
       </div>
       <div class="summary-box">
         <h3><i class="fas fa-calendar-check"></i> Bookings</h3>
-        <p>8</p>
+        <p><?php echo $totalBookings;?></p>
         <div class="trend">
           <i class="fas fa-arrow-up"></i> 
           <span>+2 this week</span>
@@ -458,22 +153,52 @@
       </div>
       <div class="summary-box">
         <h3><i class="fas fa-star"></i> Reviews</h3>
-        <p>21</p>
+        <p><?php  echo $totalReviews; ?></p>
         <div class="trend">
           <i class="fas fa-arrow-up"></i> 
           <span>98% positive</span>
         </div>
         <div class="decoration-shape"></div>
       </div>
-      <div class="summary-box">
-        <h3><i class="fas fa-coins"></i> Earnings</h3>
-        <p>GH₵ 1,400</p>
+      <?php } elseif ($userRole == 'artisan' || $userRole == 'client') { ?>
+        <!-- Artisan/Client Stats -->
+        <div class="summary-box">
+        <h3><i class="fas fa-box-open"></i> Total Users </h3>
+        <p><?php echo $totalUsers; ?></p>
         <div class="trend">
           <i class="fas fa-arrow-up"></i> 
-          <span>+GH₵ 320 this month</span>
+          <span>Users</span>
         </div>
         <div class="decoration-shape"></div>
       </div>
+      <div class="summary-box">
+        <h3><i class="fas fa-box-open"></i> Total Services </h3>
+        <p><?php echo $total_services; ?></p>
+        <div class="trend">
+          <i class="fas fa-arrow-up"></i> 
+          <span>+3 this month</span>
+        </div>
+        <div class="decoration-shape"></div>
+      </div>
+      <div class="summary-box">
+        <h3><i class="fas fa-calendar-check"></i> Bookings</h3>
+        <p><?php echo $totalBookings;?></p>
+        <div class="trend">
+          <i class="fas fa-arrow-up"></i> 
+          <span>+2 this week</span>
+        </div>
+        <div class="decoration-shape"></div>
+      </div>
+      <div class="summary-box">
+        <h3><i class="fas fa-star"></i> Reviews</h3>
+        <p><?php  echo $totalReviews; ?></p>
+        <div class="trend">
+          <i class="fas fa-arrow-up"></i> 
+          <span>98% positive</span>
+        </div>
+        <div class="decoration-shape"></div>
+      </div>
+      <?php } ?>
     </section>
 
     <div class="dashboard-grid">
