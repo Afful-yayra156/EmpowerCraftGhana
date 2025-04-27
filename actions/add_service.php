@@ -52,10 +52,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Insert service into services table including image path
         $stmt = $conn->prepare("INSERT INTO services 
-            (user_id, category_id, title, description, price, duration, availability, is_featured, creation_date, last_updated, status, image_path) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW(), ?, ?)");
+        (user_id, category_id, title, description, price, duration, availability, is_featured, creation_date, last_updated, status, image_path) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         
-        $stmt->bind_param("iissdssiss", $user_id, $category_id, $title, $description, $price, $duration, $availability, $is_featured, $status, $image_path);
+
+        
+        $creation_date = date('Y-m-d H:i:s');
+        $last_updated = date('Y-m-d H:i:s');
+
+$stmt->bind_param("iissdssissss", $user_id, $category_id, $title, $description, $price, $duration, $availability, $is_featured, $creation_date, $last_updated, $status, $image_path);
 
         if (!$stmt->execute()) {
             throw new Exception("Error inserting service: " . $stmt->error);

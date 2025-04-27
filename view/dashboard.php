@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Dashboard | EmpowerCraft</title>
+  <title>User Dashboard | EmpowerCraft</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     * {
       margin: 0;
@@ -12,195 +13,545 @@
     }
 
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f8fafc;
       display: flex;
-      min-height: 100vh;
-      background: linear-gradient(to right, #e6f2ff, #d4e6ff);
-      position: relative;
-      overflow-x: hidden;
+      color: #334155;
     }
 
     .sidebar {
       position: fixed;
       top: 0;
       left: 0;
-      width: 250px;
+      width: 280px;
       height: 100vh;
       background: linear-gradient(135deg, #4CAF50, #2196F3);
       color: white;
-      padding: 10px 15px;
+      padding: 24px;
+      box-shadow: 4px 0 20px rgba(0,0,0,0.1);
       z-index: 10;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 40px;
+    }
+
+    .logo-icon {
+      font-size: 30px;
     }
 
     .sidebar h2 {
       font-size: 24px;
-      margin-bottom: 30px;
+      font-weight: 600;
     }
 
-    .sidebar nav a {
-      display: block;
-      margin: 10px 0;
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 8px 0;
       text-decoration: none;
       color: white;
-      padding: 10px;
-      border-radius: 5px;
-      transition: background 0.3s ease;
-    }
-
-    .sidebar nav a:hover {
-      background-color: rgba(255, 255, 255, 0.2);
-    }
-
-    .dashboard-main {
-      margin-left: 250px;
-      padding: 40px;
-      flex: 1;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 30px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .dashboard-card {
-      background-color: #ffffffee;
-      padding: 25px;
+      padding: 14px 18px;
       border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      border: 1px solid #e3e3e3;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      backdrop-filter: blur(5px);
+      transition: all 0.3s ease;
+      font-weight: 500;
     }
 
-    .dashboard-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    .nav-item:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+      transform: translateX(5px);
     }
 
-    .dashboard-card h2 {
-      margin-bottom: 10px;
-      font-size: 22px;
-      color: #2e5c3d;
+    .nav-item.active {
+      background-color: rgba(255, 255, 255, 0.3);
     }
 
-    .dashboard-card p {
-      font-size: 15px;
-      line-height: 1.6;
-      color: #333;
+    .main {
+      margin-left: 280px;
+      padding: 40px;
+      width: calc(100% - 280px);
     }
 
-    .icon {
-      font-size: 30px;
-      margin-bottom: 10px;
-      display: block;
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 40px;
     }
 
-    /* Floating decorative elements */
-    .floating-element {
+    .header-left h1 {
+      font-size: 32px;
+      color: #1e293b;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .header-left p {
+      font-size: 16px;
+      color: #64748b;
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background-color: white;
+      padding: 10px 20px;
+      border-radius: 50px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: #4CAF50;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+    }
+
+    .notification-bell {
+      position: relative;
+      cursor: pointer;
+    }
+
+    .notification-badge {
       position: absolute;
-      opacity: 0.15;
+      top: -5px;
+      right: -5px;
+      background-color: #ff5722;
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+
+    .summary-box {
+      background: white;
+      padding: 24px;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+      transition: transform 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .summary-box:hover {
+      transform: translateY(-5px);
+    }
+
+    .summary-box h3 {
+      font-size: 16px;
+      color: #64748b;
+      margin-bottom: 12px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .summary-box p {
+      font-size: 28px;
+      font-weight: 700;
+      color: #0f766e;
+    }
+
+    .summary-box .trend {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 14px;
+      margin-top: 8px;
+      color: #10b981;
+    }
+
+    .trend.down {
+      color: #ef4444;
+    }
+
+    .decoration-shape {
+      position: absolute;
+      bottom: -15px;
+      right: -15px;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background-color: rgba(76, 175, 80, 0.1);
       z-index: 0;
-      pointer-events: none;
     }
 
-    .tools {
-      top: 10%;
-      right: 5%;
-      font-size: 80px;
-      transform: rotate(15deg);
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+    }
+
+    .messages-section, .upcoming-section {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .section-header h2 {
+      font-size: 20px;
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    .section-header a {
       color: #4CAF50;
-      animation: float 8s ease-in-out infinite;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
     }
 
-    .profile {
-      bottom: 15%;
-      right: 15%;
-      font-size: 70px;
-      transform: rotate(-10deg);
-      color: #2196F3;
-      animation: float 10s ease-in-out infinite 1s;
+    .message {
+      padding: 16px;
+      background: #f1f5f9;
+      border-radius: 12px;
+      margin-bottom: 16px;
+      transition: transform 0.2s ease;
+      border-left: 4px solid #4CAF50;
+      display: flex;
+      gap: 16px;
     }
 
-    .messaging {
-      top: 60%;
-      left: 20%;
-      font-size: 60px;
-      transform: rotate(5deg);
+    .message:hover {
+      transform: scale(1.02);
+    }
+
+    .message-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(76, 175, 80, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
       color: #4CAF50;
-      animation: float 7s ease-in-out infinite 0.5s;
     }
 
-    .stats {
-      top: 20%;
-      left: 30%;
-      font-size: 65px;
-      transform: rotate(-5deg);
-      color: #2196F3;
-      animation: float 9s ease-in-out infinite 2s;
+    .message-content {
+      flex: 1;
+    }
+
+    .message-content h4 {
+      font-size: 16px;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+
+    .message-content p {
+      font-size: 14px;
+      color: #64748b;
+    }
+
+    .message-time {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-top: 5px;
+    }
+
+    .upcoming-event {
+      display: flex;
+      align-items: center;
+      padding: 16px;
+      border-radius: 12px;
+      background: #f1f5f9;
+      margin-bottom: 16px;
+      transition: all 0.2s ease;
+      border-left: 4px solid #2196F3;
+    }
+
+    .upcoming-event:hover {
+      transform: translateX(5px);
+    }
+
+    .event-date {
+      width: 50px;
+      height: 50px;
+      background: #2196F3;
+      color: white;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-right: 16px;
+    }
+
+    .event-date .day {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .event-date .month {
+      font-size: 12px;
+    }
+
+    .event-details h4 {
+      font-size: 16px;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+
+    .event-details p {
+      font-size: 14px;
+      color: #64748b;
+    }
+
+    .floating-emoji {
+      position: absolute;
+      animation: float 6s ease-in-out infinite;
+      opacity: 0.5;
+      font-size: 24px;
+      z-index: -1;
     }
 
     @keyframes float {
-      0% { transform: translateY(0) rotate(0); }
-      50% { transform: translateY(-20px) rotate(5deg); }
-      100% { transform: translateY(0) rotate(0); }
+      0% {
+        transform: translateY(0px) rotate(0deg);
+      }
+      50% {
+        transform: translateY(-20px) rotate(10deg);
+      }
+      100% {
+        transform: translateY(0px) rotate(0deg);
+      }
+    }
+
+    @media (max-width: 992px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 70px;
+        padding: 20px 10px;
+      }
+      
+      .sidebar h2, .nav-text {
+        display: none;
+      }
+      
+      .logo {
+        justify-content: center;
+      }
+      
+      .main {
+        margin-left: 70px;
+        width: calc(100% - 70px);
+      }
     }
   </style>
 </head>
 <body>
+  <!-- Floating emojis -->
+  <div class="floating-emoji" style="top: 20%; left: 30%;">🧵</div>
+  <div class="floating-emoji" style="top: 15%; left: 80%; animation-delay: 1s;">🧶</div>
+  <div class="floating-emoji" style="top: 70%; left: 85%; animation-delay: 2s;">🪡</div>
+  <div class="floating-emoji" style="top: 60%; left: 20%; animation-delay: 3s;">🪵</div>
+  <div class="floating-emoji" style="top: 80%; left: 50%; animation-delay: 4s;">🧺</div>
+
   <aside class="sidebar">
-    <h2>EmpowerCraft</h2>
+    <div class="logo">
+      <div class="logo-icon"><i class="fas fa-paint-brush"></i></div>
+      <h2>EmpowerCraft</h2>
+    </div>
     <nav>
-      <a href="dashboard.php">🏠 Dashboard</a>
-      <a href="profile.html">👤 My Profile</a>
-      <a href="services.php"> 👤Services</a>
-      <a href="#">⭐ Reviews</a>
-      <a href="#">⚙ Settings</a>
-      <a href="#">🚪 Logout</a>
+      <a href="dashboard.php" class="nav-item active">
+        <i class="fas fa-home"></i>
+        <span class="nav-text">Dashboard</span>
+      </a>
+      <a href="profile.php" class="nav-item">
+        <i class="fas fa-user"></i>
+        <span class="nav-text">My Profile</span>
+      </a>
+      <a href="messages.php" class="nav-item">
+        <i class="fas fa-envelope"></i>
+        <span class="nav-text">Messages</span>
+      </a>
+      <a href="reviews.php" class="nav-item">
+        <i class="fas fa-star"></i>
+        <span class="nav-text">Reviews</span>
+      </a>
+      <a href="orders.php" class="nav-item">
+        <i class="fas fa-shopping-cart"></i>
+        <span class="nav-text">Orders</span>
+      </a>
+      <a href="#" class="nav-item">
+        <i class="fas fa-chart-line"></i>
+        <span class="nav-text">Analytics</span>
+      </a>
+      <a href="#" class="nav-item">
+        <i class="fas fa-cog"></i>
+        <span class="nav-text">Settings</span>
+      </a>
+      <a href="logout.php" class="nav-item">
+        <i class="fas fa-sign-out-alt"></i>
+        <span class="nav-text">Logout</span>
+      </a>
     </nav>
   </aside>
 
-  <!-- Floating decorative elements -->
-  <div class="floating-element tools">🛠️</div>
-  <div class="floating-element profile">👤</div>
-  <div class="floating-element messaging">💬</div>
-  <div class="floating-element stats">📊</div>
-
-  <main class="dashboard-main">
-    <section class="dashboard-card">
-      <span class="icon">👥</span>
-      <h2>Welcome to EmpowerCraft</h2>
-      <p>This dashboard provides a snapshot of user activity and system statistics. EmpowerCraft is dedicated to connecting skilled individuals with those in need of their expertise, creating opportunities for artisans and making services accessible.</p>
+  <main class="main">
+    <section class="header">
+      <div class="header-left">
+        <h1>Welcome back, Kwame</h1>
+        <p>Here's what's happening with your craft business</p>
+      </div>
+      <div class="user-profile">
+        <div class="notification-bell">
+          <i class="fas fa-bell"></i>
+          <span class="notification-badge">3</span>
+        </div>
+        <div class="avatar">K</div>
+      </div>
     </section>
 
-    <section class="dashboard-card">
-      <span class="icon">📈</span>
-      <h2>Statistics Overview</h2>
-      <p>We currently have over <strong>1,200 active users</strong> and <strong>320 verified artisans</strong> registered on the platform. Monthly traffic has increased by <strong>25%</strong> since our last update.</p>
+    <section class="summary">
+      <div class="summary-box">
+        <h3><i class="fas fa-box-open"></i> Total Services</h3>
+        <p>12</p>
+        <div class="trend">
+          <i class="fas fa-arrow-up"></i> 
+          <span>+3 this month</span>
+        </div>
+        <div class="decoration-shape"></div>
+      </div>
+      <div class="summary-box">
+        <h3><i class="fas fa-calendar-check"></i> Bookings</h3>
+        <p>8</p>
+        <div class="trend">
+          <i class="fas fa-arrow-up"></i> 
+          <span>+2 this week</span>
+        </div>
+        <div class="decoration-shape"></div>
+      </div>
+      <div class="summary-box">
+        <h3><i class="fas fa-star"></i> Reviews</h3>
+        <p>21</p>
+        <div class="trend">
+          <i class="fas fa-arrow-up"></i> 
+          <span>98% positive</span>
+        </div>
+        <div class="decoration-shape"></div>
+      </div>
+      <div class="summary-box">
+        <h3><i class="fas fa-coins"></i> Earnings</h3>
+        <p>GH₵ 1,400</p>
+        <div class="trend">
+          <i class="fas fa-arrow-up"></i> 
+          <span>+GH₵ 320 this month</span>
+        </div>
+        <div class="decoration-shape"></div>
+      </div>
     </section>
 
-    <section class="dashboard-card">
-      <span class="icon">🛠</span>
-      <h2>Artisan Performance</h2>
-      <p>Our top-rated artisans have completed more than <strong>3,000 tasks</strong> combined. Feedback shows a <strong>98% satisfaction rate</strong>, reflecting our commitment to quality service.</p>
-    </section>
+    <div class="dashboard-grid">
+      <section class="messages-section">
+        <div class="section-header">
+          <h2>Recent Messages</h2>
+          <a href="#">View all</a>
+        </div>
+        <div class="message">
+          <div class="message-icon">
+            <i class="fas fa-envelope"></i>
+          </div>
+          <div class="message-content">
+            <h4>New Inquiry</h4>
+            <p>You have a new inquiry for your Kente bag.</p>
+            <div class="message-time">2 hours ago</div>
+          </div>
+        </div>
+        <div class="message">
+          <div class="message-icon">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <div class="message-content">
+            <h4>Booking Confirmed</h4>
+            <p>Booking confirmed for Woodcraft Repair.</p>
+            <div class="message-time">Yesterday</div>
+          </div>
+        </div>
+        <div class="message">
+          <div class="message-icon">
+            <i class="fas fa-star"></i>
+          </div>
+          <div class="message-content">
+            <h4>New Review</h4>
+            <p>Kofi left a 5-star review on your Beaded Jewelry.</p>
+            <div class="message-time">2 days ago</div>
+          </div>
+        </div>
+      </section>
 
-    <section class="dashboard-card">
-      <span class="icon">📝</span>
-      <h2>Latest Updates</h2>
-      <p>New features include a direct messaging system, advanced booking tools, and improved profile customization. We're constantly working to enhance user experience on EmpowerCraft.</p>
-    </section>
-
-    <section class="dashboard-card">
-      <span class="icon">🔒</span>
-      <h2>Security & Privacy</h2>
-      <p>Your information is protected by end-to-end encryption. We follow strict data protection regulations to ensure privacy and confidentiality across all user interactions.</p>
-    </section>
-
-    <section class="dashboard-card">
-      <span class="icon">📢</span>
-      <h2>Announcements</h2>
-      <p>🎉 EmpowerCraft is expanding! We're rolling out our services to two new regions. Stay tuned for more features and events coming your way this quarter.</p>
-    </section>
+      <section class="upcoming-section">
+        <div class="section-header">
+          <h2>Upcoming Bookings</h2>
+          <a href="#">View calendar</a>
+        </div>
+        <div class="upcoming-event">
+          <div class="event-date">
+            <div class="day">28</div>
+            <div class="month">APR</div>
+          </div>
+          <div class="event-details">
+            <h4>Weaving Workshop</h4>
+            <p>10:00 AM - 12:00 PM</p>
+          </div>
+        </div>
+        <div class="upcoming-event">
+          <div class="event-date">
+            <div class="day">03</div>
+            <div class="month">MAY</div>
+          </div>
+          <div class="event-details">
+            <h4>Pottery Delivery</h4>
+            <p>2:30 PM - 3:30 PM</p>
+          </div>
+        </div>
+        <div class="upcoming-event">
+          <div class="event-date">
+            <div class="day">09</div>
+            <div class="month">MAY</div>
+          </div>
+          <div class="event-details">
+            <h4>Woodcraft Class</h4>
+            <p>1:00 PM - 4:00 PM</p>
+          </div>
+        </div>
+      </section>
+    </div>
   </main>
 </body>
 </html>
+

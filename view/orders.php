@@ -343,8 +343,8 @@
             <a href="dashboard.html">Dashboard</a>
             <a href="services.html">Services</a>
             <a href="listings.html">Listings</a>
-            <a href="orders.html" class="active">Orders</a>
-            <a href="messages.html">Messages</a>
+            <a href="orders.php" class="active">Orders</a>
+            <a href="messages.php">Messages</a>
         </div>
 
         <div class="content">
@@ -375,12 +375,12 @@
 
     <script>
         // Check if user is logged in
-        let user = JSON.parse(localStorage.getItem("loggedInUser"));
+        // let user = JSON.parse(localStorage.getItem("loggedInUser"));
         
-        if (!user) {
-            alert("Please log in first!");
-            window.location.href = "login.php";
-        }
+        // if (!user) {
+        //     alert("Please log in first!");
+        //     window.location.href = "login.php";
+        // }
         
         // Sample orders data (Replace with API call in production)
         let orders = [

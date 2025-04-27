@@ -17,8 +17,8 @@
             <a href="dashboard.php">Dashboard</a>
             <a href="services.html" class="active">Services</a>
             <a href="listings.html">Listings</a>
-            <a href="orders.html">Orders</a>
-            <a href="messages.html">Messages</a>
+            <a href="orders.php">Orders</a>
+            <a href="messages.php">Messages</a>
         </div>
 
         <div class="content">

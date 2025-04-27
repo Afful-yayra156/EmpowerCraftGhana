@@ -851,7 +851,7 @@ else {
             <a href="dashboard.php">Dashboard</a>
             <a href="services.html">Services</a>
             <a href="listings.html">Listings</a>
-            <a href="orders.html">Orders</a>
+            <a href="orders.php">Orders</a>
             <a href="#" class="active">Checkout</a>
         </div>
 
