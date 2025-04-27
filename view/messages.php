@@ -206,8 +206,8 @@
         <div class="logo">EmpowerCraft Ghana</div>
         <nav class="nav">
             <a href="index.html">Home</a>
-            <a href="login.php">Login</a>
-            <a href="signup.php">Sign Up</a>
+            <a href="dashboard.php">Dashnoard</a>
+            
         </nav>
     </header>
     
