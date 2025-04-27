@@ -1,49 +1,108 @@
-
 <?php
 session_start();
 include '../db/config.php'; 
 
+// Redirect if not logged in
 if (!isset($_SESSION['fname'])) {
     header('Location: login.php');
     exit();
 }
 
 $userRole = $_SESSION['role'];
+$user_id = $_SESSION['user_id']; 
 
-$sql_users = "SELECT COUNT(*) AS total_users FROM users";
-$result_users = $conn->query($sql_users);
+// Initialize variables with default values
+$totalUsers = 0;
+$total_services = 0;
+$totalBookings = 0;
+$totalReviews = 0;
+$total_userservices = 0;
+$totaluserBookings = 0;
+$totaluserReviews = 0;
 
-$totalUsers = 0; // Default to 0 if no users found
-if ($result_users && $row_users = $result_users->fetch_assoc()) {
-    $totalUsers = $row_users['total_users'];
+// Error handling function
+function handleQueryError($conn, $query) {
+    if ($conn->error) {
+        error_log("Query error: " . $query . " - " . $conn->error);
+        return false;
+    }
+    return true;
 }
 
-// Query to get total reviews count for calculating the percentage
-$query_total_reviews = "SELECT COUNT(*) AS total_reviews FROM reviews";
-$result_total_reviews = $conn->query($query_total_reviews);
-
-if ($result_total_reviews && $row_total_reviews = $result_total_reviews->fetch_assoc()) {
-    $totalReviews = $row_total_reviews['total_reviews'];
+// Admin statistics
+if ($userRole == 'admin') {
+    // Get total users
+    $sql_users = "SELECT COUNT(*) AS total_users FROM users";
+    $result_users = $conn->query($sql_users);
+    handleQueryError($conn, $sql_users);
+    
+    if ($result_users && $row_users = $result_users->fetch_assoc()) {
+        $totalUsers = $row_users['total_users'];
+    }
+    
+    // Get total services
+    $sql_services = "SELECT COUNT(*) AS total_services FROM services";
+    $result_services = $conn->query($sql_services);
+    handleQueryError($conn, $sql_services);
+    
+    if ($result_services && $row_services = $result_services->fetch_assoc()) {
+        $total_services = $row_services['total_services'];
+    }
+    
+    // Get total bookings
+    $sql_bookings = "SELECT COUNT(*) AS total_bookings FROM bookings";
+    $result_bookings = $conn->query($sql_bookings);
+    handleQueryError($conn, $sql_bookings);
+    
+    if ($result_bookings && $row_bookings = $result_bookings->fetch_assoc()) {
+        $totalBookings = $row_bookings['total_bookings'];
+    }
+    
+    // Get total reviews
+    $sql_reviews = "SELECT COUNT(*) AS total_reviews FROM reviews";
+    $result_reviews = $conn->query($sql_reviews);
+    handleQueryError($conn, $sql_reviews);
+    
+    if ($result_reviews && $row_reviews = $result_reviews->fetch_assoc()) {
+        $totalReviews = $row_reviews['total_reviews'];
+    }
 }
 
-
-// Query to get the total number of bookings
-$sql_bookings = "SELECT COUNT(*) AS total_bookings FROM bookings"; 
-$result_bookings = $conn->query($sql_bookings);
-
-$totalBookings = 0; // Default to 0 if no bookings found
-if ($result_bookings && $row_bookings = $result_bookings->fetch_assoc()) {
-    $totalBookings = $row_bookings['total_bookings'];
+// User-specific statistics (for both artisan and client)
+if ($userRole == 'artisan' || $userRole == 'client') {
+    // Get user's services
+    $stmt_services = $conn->prepare("SELECT COUNT(*) AS total_services FROM services WHERE user_id = ?");
+    $stmt_services->bind_param("i", $user_id);
+    $stmt_services->execute();
+    $result_services = $stmt_services->get_result();
+    
+    if ($result_services && $row_services = $result_services->fetch_assoc()) {
+        $total_userservices = $row_services['total_services'];
+    }
+    $stmt_services->close();
+    
+    // Get user's bookings
+    $stmt_bookings = $conn->prepare("SELECT COUNT(*) AS total_bookings FROM bookings WHERE booking_id = ?");
+    $stmt_bookings->bind_param("i", $user_id);
+    $stmt_bookings->execute();
+    $result_bookings = $stmt_bookings->get_result();
+    
+    if ($result_bookings && $row_bookings = $result_bookings->fetch_assoc()) {
+        $totaluserBookings = $row_bookings['total_bookings'];
+    }
+    $stmt_bookings->close();
+    
+    // Get user's reviews
+    $stmt_reviews = $conn->prepare("SELECT COUNT(*) AS total_reviews FROM reviews WHERE review_id = ?");
+    $stmt_reviews->bind_param("i", $user_id);
+    $stmt_reviews->execute();
+    $result_reviews = $stmt_reviews->get_result();
+    
+    if ($result_reviews && $row_reviews = $result_reviews->fetch_assoc()) {
+        $totaluserReviews = $row_reviews['total_reviews'];
+    }
+    $stmt_reviews->close();
 }
-
-$sql_count = "SELECT COUNT(*) AS total_services FROM services";
-$result_count = $conn->query($sql_count);
-
-$total_services = 0; // Default to 0 if no services found
-if ($result_count && $row_count = $result_count->fetch_assoc()) {
-    $total_services = $row_count['total_services'];
-}
-
 ?>
 
 <!DOCTYPE html>
@@ -53,8 +112,7 @@ if ($result_count && $row_count = $result_count->fetch_assoc()) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>User Dashboard | EmpowerCraft</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel ="stylesheet" href = "../assets/css/dashboard.css">
-
+  <link rel="stylesheet" href="../assets/css/dashboard.css">
 </head>
 <body>
   <!-- Floating emojis -->
@@ -105,7 +163,6 @@ if ($result_count && $row_count = $result_count->fetch_assoc()) {
     </nav>
   </aside>
 
-
   <main class="main">
     <section class="header">
       <div class="header-left">
@@ -117,87 +174,80 @@ if ($result_count && $row_count = $result_count->fetch_assoc()) {
           <i class="fas fa-bell"></i>
           <span class="notification-badge">3</span>
         </div>
-        <div class="avatar">K</div>
+        <div class="avatar">
+          <?php echo htmlspecialchars(substr($_SESSION['fname'], 0, 1)); ?>
+        </div>
       </div>
     </section>
 
     <section class="summary">
-
-    <div class="summary-box">
-     <?php if ($userRole == 'admin') { ?>
-        <h3><i class="fas fa-box-open"></i> Total Users </h3>
-        <p><?php echo $totalUsers; ?></p>
-        <div class="trend">
-          <i class="fas fa-arrow-up"></i> 
-          <span>Users</span>
-        </div>
-        <div class="decoration-shape"></div>
-      </div>
-      <div class="summary-box">
-        <h3><i class="fas fa-box-open"></i> Total Services </h3>
-        <p><?php echo $total_services; ?></p>
-        <div class="trend">
-          <i class="fas fa-arrow-up"></i> 
-          <span>+3 this month</span>
-        </div>
-        <div class="decoration-shape"></div>
-      </div>
-      <div class="summary-box">
-        <h3><i class="fas fa-calendar-check"></i> Bookings</h3>
-        <p><?php echo $totalBookings;?></p>
-        <div class="trend">
-          <i class="fas fa-arrow-up"></i> 
-          <span>+2 this week</span>
-        </div>
-        <div class="decoration-shape"></div>
-      </div>
-      <div class="summary-box">
-        <h3><i class="fas fa-star"></i> Reviews</h3>
-        <p><?php  echo $totalReviews; ?></p>
-        <div class="trend">
-          <i class="fas fa-arrow-up"></i> 
-          <span>98% positive</span>
-        </div>
-        <div class="decoration-shape"></div>
-      </div>
-      <?php } elseif ($userRole == 'artisan' || $userRole == 'client') { ?>
-        <!-- Artisan/Client Stats -->
+      <?php if ($userRole == 'admin') { ?>
+        <!-- Admin stats -->
         <div class="summary-box">
-        <h3><i class="fas fa-box-open"></i> Total Users </h3>
-        <p><?php echo $totalUsers; ?></p>
-        <div class="trend">
-          <i class="fas fa-arrow-up"></i> 
-          <span>Users</span>
+          <h3><i class="fas fa-users"></i> Total Users</h3>
+          <p><?php echo $totalUsers; ?></p>
+          <div class="trend">
+            <i class="fas fa-arrow-up"></i> 
+            <span>Users</span>
+          </div>
+          <div class="decoration-shape"></div>
         </div>
-        <div class="decoration-shape"></div>
-      </div>
-      <div class="summary-box">
-        <h3><i class="fas fa-box-open"></i> Total Services </h3>
-        <p><?php echo $total_services; ?></p>
-        <div class="trend">
-          <i class="fas fa-arrow-up"></i> 
-          <span>+3 this month</span>
+        <div class="summary-box">
+          <h3><i class="fas fa-box-open"></i> Total Services</h3>
+          <p><?php echo $total_services; ?></p>
+          <div class="trend">
+            <i class="fas fa-arrow-up"></i> 
+            <span>+3 this month</span>
+          </div>
+          <div class="decoration-shape"></div>
         </div>
-        <div class="decoration-shape"></div>
-      </div>
-      <div class="summary-box">
-        <h3><i class="fas fa-calendar-check"></i> Bookings</h3>
-        <p><?php echo $totalBookings;?></p>
-        <div class="trend">
-          <i class="fas fa-arrow-up"></i> 
-          <span>+2 this week</span>
+        <div class="summary-box">
+          <h3><i class="fas fa-calendar-check"></i> Bookings</h3>
+          <p><?php echo $totalBookings; ?></p>
+          <div class="trend">
+            <i class="fas fa-arrow-up"></i> 
+            <span>+2 this week</span>
+          </div>
+          <div class="decoration-shape"></div>
         </div>
-        <div class="decoration-shape"></div>
-      </div>
-      <div class="summary-box">
-        <h3><i class="fas fa-star"></i> Reviews</h3>
-        <p><?php  echo $totalReviews; ?></p>
-        <div class="trend">
-          <i class="fas fa-arrow-up"></i> 
-          <span>98% positive</span>
+        <div class="summary-box">
+          <h3><i class="fas fa-star"></i> Reviews</h3>
+          <p><?php echo $totalReviews; ?></p>
+          <div class="trend">
+            <i class="fas fa-arrow-up"></i> 
+            <span>98% positive</span>
+          </div>
+          <div class="decoration-shape"></div>
         </div>
-        <div class="decoration-shape"></div>
-      </div>
+      <?php } else { ?>
+        <!-- User stats (artisan/client) -->
+        <div class="summary-box">
+          <h3><i class="fas fa-box-open"></i> My Services</h3>
+          <p><?php echo $total_userservices; ?></p>
+          <div class="trend">
+            <i class="fas fa-arrow-up"></i> 
+            <span>+3 this month</span>
+          </div>
+          <div class="decoration-shape"></div>
+        </div>
+        <div class="summary-box">
+          <h3><i class="fas fa-calendar-check"></i> My Bookings</h3>
+          <p><?php echo $totaluserBookings; ?></p>
+          <div class="trend">
+            <i class="fas fa-arrow-up"></i> 
+            <span>+2 this week</span>
+          </div>
+          <div class="decoration-shape"></div>
+        </div>
+        <div class="summary-box">
+          <h3><i class="fas fa-star"></i> My Reviews</h3>
+          <p><?php echo $totaluserReviews; ?></p>
+          <div class="trend">
+            <i class="fas fa-arrow-up"></i> 
+            <span>98% positive</span>
+          </div>
+          <div class="decoration-shape"></div>
+        </div>
       <?php } ?>
     </section>
 
@@ -205,7 +255,7 @@ if ($result_count && $row_count = $result_count->fetch_assoc()) {
       <section class="messages-section">
         <div class="section-header">
           <h2>Recent Messages</h2>
-          <a href="#">View all</a>
+          <a href="messages.php">View all</a>
         </div>
         <div class="message">
           <div class="message-icon">
@@ -242,7 +292,7 @@ if ($result_count && $row_count = $result_count->fetch_assoc()) {
       <section class="upcoming-section">
         <div class="section-header">
           <h2>Upcoming Bookings</h2>
-          <a href="#">View calendar</a>
+          <a href="orders.php">View calendar</a>
         </div>
         <div class="upcoming-event">
           <div class="event-date">
@@ -279,4 +329,3 @@ if ($result_count && $row_count = $result_count->fetch_assoc()) {
   </main>
 </body>
 </html>
-

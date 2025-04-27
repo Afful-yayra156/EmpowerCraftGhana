@@ -1,8 +1,54 @@
+<?php
+session_start();
+include '../db/config.php';
+
+$user_id = $_SESSION['user_id'];
+
+// Fetch user info from database
+$sql = "SELECT first_name, last_name, email, bio, phone_number, location, profile_picture FROM users WHERE user_id = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$user = $result->fetch_assoc();
+
+// Update user info when form is submitted
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $full_name = $_POST['full_name'];
+    $email = $_POST['email'];
+    $bio = $_POST['bio'];
+    $location = $_POST['location'];
+    $phone_number = $_POST['phone_number'];
+
+    // Optionally split full name into first and last
+    $names = explode(' ', $full_name, 2);
+    $first_name = $names[0];
+    $last_name = isset($names[1]) ? $names[1] : '';
+
+    $updateSql = "UPDATE users SET first_name=?, last_name=?, location=?, phone_number=? , bio=? WHERE user_id=?";
+    $updateStmt = $conn->prepare($updateSql);
+    $updateStmt->bind_param("sssisi", $first_name, $last_name, $location, $phone_number, $bio, $user_id);
+
+    if ($updateStmt->execute()) {
+        // Refresh user data
+        header("Location: profile.php"); 
+        exit();
+    } else {
+        echo "Error updating profile.";
+    }
+}
+
+
+
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel ="stylesheet" href = "../assets/css/profile.css" >
   <title>Profile | EmpowerCraft</title>
   
 </head>
@@ -21,26 +67,55 @@
   <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLW1lc3NhZ2Utc3F1YXJlIj48cGF0aCBkPSJNMjEgMTVhMiAyIDAgMCAxLTIgMkg3bC00IDR2LTRhMiAyIDAgMCAxLTItMlY1YTIgMiAwIDAgMSAyLTJoMTRhMiAyIDAgMCAxIDIgMnoiLz48L3N2Zz4=" alt="Message Icon" class="floating-icon icon-message">
 
   <aside class="sidebar">
-    <h2>EmpowerCraft</h2>
+    <div class="logo">
+      <div class="logo-icon"><i class="fas fa-paint-brush"></i></div>
+      <h2>EmpowerCraft</h2>
+    </div>
     <nav>
-      <a href="dashboard.php">🏠 Dashboard</a>
-      <a href="profile.html" class="active">👤 My Profile</a>
-      <a href="#">💬 Messages</a>
-      <a href="#">⭐ Reviews</a>
-      <a href="#">⚙ Settings</a>
-      <a href="#">🚪 Logout</a>
+      <a href="dashboard.php" class="nav-item active">
+        <i class="fas fa-home"></i>
+        <span class="nav-text">Dashboard</span>
+      </a>
+      <a href="profile.php" class="nav-item">
+        <i class="fas fa-user"></i>
+        <span class="nav-text">My Profile</span>
+      </a>
+      <a href="messages.php" class="nav-item">
+        <i class="fas fa-envelope"></i>
+        <span class="nav-text">Messages</span>
+      </a>
+      <a href="reviews.php" class="nav-item">
+        <i class="fas fa-star"></i>
+        <span class="nav-text">Reviews</span>
+      </a>
+      <a href="orders.php" class="nav-item">
+        <i class="fas fa-shopping-cart"></i>
+        <span class="nav-text">Orders</span>
+      </a>
+      <a href="#" class="nav-item">
+        <i class="fas fa-chart-line"></i>
+        <span class="nav-text">Analytics</span>
+      </a>
+      <a href="#" class="nav-item">
+        <i class="fas fa-cog"></i>
+        <span class="nav-text">Settings</span>
+      </a>
+      <a href="logout.php" class="nav-item">
+        <i class="fas fa-sign-out-alt"></i>
+        <span class="nav-text">Logout</span>
+      </a>
     </nav>
   </aside>
 
   <main class="profile-main-full">
     <section class="profile-header">
       <div class="avatar-container">
-        <img src="../assets/images/velma.jpg" alt="User Avatar" class="avatar" id="profile-avatar"/>
+        <img src="<?php echo htmlspecialchars($user['profile_picture']); ?>" alt="User Avatar" class="avatar" id="profile-avatar"/>
         <label for="avatar-upload" class="change-avatar" title="Change Profile Picture">📷</label>
         <input type="file" id="avatar-upload" accept="image/*"/>
       </div>
       <div>
-        <h1>User Full Name</h1>
+        <h1><?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?></h1>
         <p>Artisan - Woodwork & Decor</p>
       </div>
     </section>
@@ -48,26 +123,30 @@
     <div class="profile-columns">
       <section class="profile-info">
         <h2>About Me</h2>
-        <p>Hello! I'm a passionate wood artisan based in Accra. I create handmade furniture and offer repairs.</p>
+        <p><?php echo htmlspecialchars($user['bio']); ?></p>
 
         <h2>Contact Info</h2>
         <ul>
-          <li><strong>Email:</strong> user@email.com</li>
-          <li><strong>Phone:</strong> +233 24 000 0000</li>
-          <li><strong>Location:</strong> Kumasi, Ghana</li>
+          <li><strong>Email:</strong> <?php echo htmlspecialchars($user['email']); ?></li>
+          <li><strong>Phone:</strong> <?php echo htmlspecialchars($user['phone_number']); ?></li>
+          <li><strong>Location:</strong> <?php echo htmlspecialchars($user['location']); ?></li>
         </ul>
       </section>
 
       <section class="edit-profile">
         <h2>Edit Profile</h2>
-        <form>
-          <input type="text" placeholder="Full Name" value="User Full Name"/>
-          <input type="email" placeholder="Email" value="user@email.com"/>
-          <textarea placeholder="Bio">I'm a passionate wood artisan...</textarea>
+        <form method="post">
+          <input type="text" name="full_name" placeholder="Full Name" value="<?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?>" required/>
+          <input type="text" name="phone_number" placeholder="Phone Number" value="<?php echo htmlspecialchars($user['phone_number']); ?>" required/>
+          <input type="text" name="location" placeholder="Location" value="<?php echo htmlspecialchars($user['location']); ?>" required/>
+          <textarea name="bio" placeholder="Bio"><?php echo htmlspecialchars($user['bio']); ?></textarea>
           <button type="submit">Save Changes</button>
         </form>
       </section>
     </div>
+
+    <!-- Reviews section remains the same -->
+
 
     <section class="reviews-comments">
       <h2>Reviews</h2>
