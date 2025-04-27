@@ -60,6 +60,11 @@
                         <textarea id="serviceDescription" name="description" class="form-control" placeholder="Enter service description" required></textarea>
                     </div>
                     <div class="form-group">
+                        <label for="category" class="form-label">Category</label>
+                        <input type="text" id="category" name="category" class="form-control" placeholder="Enter service category" required>
+                    </div>
+
+                    <div class="form-group">
                         <label for="service_image" class="form-label">Upload Descriptive Image(s)</label>
                         <input type="file" class="form-control" name="service_image[]" id="service_image" accept="image/*" multiple>
                     </div>
@@ -81,7 +86,7 @@
                 include '../assets/functions/service_functions.php'; // optional: if functions are modularized
                 session_start();
 
-                $sql = "SELECT s.service_id, s.title, s.price, s.image_path 
+                $sql = "SELECT s.service_id, s.title, s.price, s.image_path s.category
                         FROM services s 
                         GROUP BY s.service_id";  // Fetch one image per service (if available)
 
@@ -97,6 +102,7 @@
                             <?php endif; ?>
                             <div>
                                 <h4 style="margin: 0;"><?= htmlspecialchars($row['title']) ?></h4>
+                                <p style="margin: 4px 0;">Category: <?= htmlspecialchars($row['title']) ?></p>
                                 <p style="margin: 4px 0;">GHS <?= number_format($row['price'], 2) ?></p>
                             </div>
                         </div>

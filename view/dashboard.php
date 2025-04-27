@@ -102,6 +102,23 @@ if ($userRole == 'artisan' || $userRole == 'client') {
         $totaluserReviews = $row_reviews['total_reviews'];
     }
     $stmt_reviews->close();
+
+
+
+}
+
+// Move this code OUTSIDE of any user role conditions - place it before the last closing PHP tag
+$sql_contacts = "SELECT id, first_name, last_name, message, submitted_at 
+                FROM contact_messages 
+                ORDER BY submitted_at DESC 
+                LIMIT 3";
+$result_contacts = $conn->query($sql_contacts);
+$recent_contacts = [];
+
+if ($result_contacts && $result_contacts->num_rows > 0) {
+    while($row = $result_contacts->fetch_assoc()) {
+        $recent_contacts[] = $row;
+    }
 }
 ?>
 
@@ -143,6 +160,11 @@ if ($userRole == 'artisan' || $userRole == 'client') {
       <a href="reviews.php" class="nav-item">
         <i class="fas fa-star"></i>
         <span class="nav-text">Reviews</span>
+      </a>
+
+      <a href="services.php" class="nav-item">
+        <i class="fas fa-shopping-cart"></i>
+        <span class="nav-text">Services</span>
       </a>
       <a href="orders.php" class="nav-item">
         <i class="fas fa-shopping-cart"></i>
@@ -219,6 +241,79 @@ if ($userRole == 'artisan' || $userRole == 'client') {
           </div>
           <div class="decoration-shape"></div>
         </div>
+
+    </section>
+
+      <div class="dashboard-grid">
+  <section class="messages-section">
+    <div class="section-header">
+      <h2>Recent Messages</h2>
+      <a href="messages.php">View all</a>
+    </div>
+    
+    <?php if (!empty($recent_contacts)): ?>
+      <?php foreach ($recent_contacts as $contact): ?>
+        <div class="message">
+          <div class="message-icon">
+            <i class="fas fa-envelope"></i>
+          </div>
+          <div class="message-content">
+            <h4><?php echo htmlspecialchars($contact['first_name'] . ' ' . $contact['last_name']); ?></h4>
+            <p><?php echo htmlspecialchars(substr($contact['message'], 0, 100)); ?>...</p>
+            <div class="message-time"><?php echo date('F j, Y', strtotime($contact['submitted_at'])); ?></div>
+          </div>
+        </div>
+      <?php endforeach; ?>
+    <?php else: ?>
+      <div class="message">
+        <div class="message-content">
+          <h4>No Recent Messages</h4>
+          <p>There are no recent contact messages to display.</p>
+        </div>
+      </div>
+    <?php endif; ?>
+               
+    
+        
+      </section>
+
+      <section class="upcoming-section">
+        <div class="section-header">
+          <h2>Upcoming Bookings</h2>
+          <a href="orders.php">View calendar</a>
+        </div>
+        <div class="upcoming-event">
+          <div class="event-date">
+            <div class="day">28</div>
+            <div class="month">APR</div>
+          </div>
+          <div class="event-details">
+            <h4>Weaving Workshop</h4>
+            <p>10:00 AM - 12:00 PM</p>
+          </div>
+        </div>
+        <div class="upcoming-event">
+          <div class="event-date">
+            <div class="day">03</div>
+            <div class="month">MAY</div>
+          </div>
+          <div class="event-details">
+            <h4>Pottery Delivery</h4>
+            <p>2:30 PM - 3:30 PM</p>
+          </div>
+        </div>
+        <div class="upcoming-event">
+          <div class="event-date">
+            <div class="day">09</div>
+            <div class="month">MAY</div>
+          </div>
+          <div class="event-details">
+            <h4>Woodcraft Class</h4>
+            <p>1:00 PM - 4:00 PM</p>
+          </div>
+        </div>
+      </section>
+    </div>
       <?php } else { ?>
         <!-- User stats (artisan/client) -->
         <div class="summary-box">
@@ -251,7 +346,7 @@ if ($userRole == 'artisan' || $userRole == 'client') {
       <?php } ?>
     </section>
 
-    <div class="dashboard-grid">
+    <!-- <div class="dashboard-grid">
       <section class="messages-section">
         <div class="section-header">
           <h2>Recent Messages</h2>
@@ -325,7 +420,7 @@ if ($userRole == 'artisan' || $userRole == 'client') {
           </div>
         </div>
       </section>
-    </div>
+    </div> -->
   </main>
 </body>
 </html>

@@ -20,6 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $duration = isset($_POST['duration']) ? trim($_POST['duration']) : 'Not specified';
     $availability = isset($_POST['availability']) ? trim($_POST['availability']) : 'Available';
     $is_featured = isset($_POST['is_featured']) ? 1 : 0;
+    $category = $_POST['category'];
     $status = 'active';
     $image_path = null;
 
@@ -52,15 +53,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Insert service into services table including image path
         $stmt = $conn->prepare("INSERT INTO services 
-        (user_id, category_id, title, description, price, duration, availability, is_featured, creation_date, last_updated, status, image_path) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        (user_id, category_id, title, description ,category, price, duration, availability, is_featured, creation_date, last_updated, status, image_path) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?)");
         
 
         
         $creation_date = date('Y-m-d H:i:s');
         $last_updated = date('Y-m-d H:i:s');
 
-$stmt->bind_param("iissdssissss", $user_id, $category_id, $title, $description, $price, $duration, $availability, $is_featured, $creation_date, $last_updated, $status, $image_path);
+        $stmt->bind_param("iisssdssissss", $user_id, $category_id, $title, $description, $category, $price, $duration, $availability, $is_featured, $creation_date, $last_updated, $status, $image_path);
 
         if (!$stmt->execute()) {
             throw new Exception("Error inserting service: " . $stmt->error);
