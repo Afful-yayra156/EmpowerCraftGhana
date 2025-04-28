@@ -81,16 +81,19 @@ if ($userRole == 'artisan' || $userRole == 'client') {
     }
     $stmt_services->close();
     
-    // Get user's bookings
-    $stmt_bookings = $conn->prepare("SELECT COUNT(*) AS total_bookings FROM bookings WHERE booking_id = ?");
+// Get total orders placed on *your* services
+    $stmt_bookings = $conn->prepare(
+      "SELECT COUNT(*) AS total_bookings
+      FROM orders o
+      JOIN services s ON o.service_id = s.service_id
+      WHERE s.user_id = ?"
+    );
     $stmt_bookings->bind_param("i", $user_id);
     $stmt_bookings->execute();
-    $result_bookings = $stmt_bookings->get_result();
-    
-    if ($result_bookings && $row_bookings = $result_bookings->fetch_assoc()) {
-        $totaluserBookings = $row_bookings['total_bookings'];
-    }
+    $stmt_bookings->bind_result($totaluserBookings);
+    $stmt_bookings->fetch();
     $stmt_bookings->close();
+
     
     // Get user's reviews
     $stmt_reviews = $conn->prepare("SELECT COUNT(*) AS total_reviews FROM reviews WHERE review_id = ?");
@@ -178,7 +181,7 @@ $stmt->fetch();
         <i class="fas fa-shopping-cart"></i>
         <span class="nav-text">Orders</span>
       </a>
-      <a href="#" class="nav-item">
+      <a href="analytics.php" class="nav-item">
         <i class="fas fa-chart-line"></i>
         <span class="nav-text">Analytics</span>
       </a>
@@ -201,7 +204,7 @@ $stmt->fetch();
       </div>
       <div class="user-profile">
         <div class="notification-bell">
-          <i class="fas fa-bell"></i>
+          <i class="fas fa-shopping-cart"></i>
           <span class="notification-badge"><?php echo $num_services; ?></span>
         </div>
         <div class="avatar">

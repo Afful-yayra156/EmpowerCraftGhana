@@ -69,11 +69,6 @@
                         <select id="userType" name="userType">
                             <option value="artisan">Artisan</option>
                             <option value="client">Client</option>
-                            <option value="stylist">Hairstylist/Beautician</option>
-                            <option value="teacher">Teacher</option>
-                            <option value="weaver">Weaver/Textile Artist</option>
-                            <option value="digital">Digital Professional</option>
-                            <option value="other">Other Professional</option>
                         </select>
                     </div>
                     <div class="form-row">
