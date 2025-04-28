@@ -77,7 +77,7 @@
         <h3>Leave a Review</h3>
         <select id="reviewType">
             <option value="service">Service</option>
-            <option value="listing">Listing</option>
+            <option value="checkout">checkout</option>
             <option value="user">User</option>
         </select>
         <input type="text" id="reviewerName" placeholder="Your Name">

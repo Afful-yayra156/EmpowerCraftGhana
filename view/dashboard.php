@@ -120,6 +120,14 @@ if ($result_contacts && $result_contacts->num_rows > 0) {
         $recent_contacts[] = $row;
     }
 }
+
+
+$sql = "SELECT COUNT(*) FROM orders WHERE buyer_id = ? AND status = 'cart'";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $user_id); // Bind the buyer_id parameter
+$stmt->execute();
+$stmt->bind_result($num_services);
+$stmt->fetch();
 ?>
 
 <!DOCTYPE html>
@@ -194,7 +202,7 @@ if ($result_contacts && $result_contacts->num_rows > 0) {
       <div class="user-profile">
         <div class="notification-bell">
           <i class="fas fa-bell"></i>
-          <span class="notification-badge">3</span>
+          <span class="notification-badge"><?php echo $num_services; ?></span>
         </div>
         <div class="avatar">
           <?php echo htmlspecialchars(substr($_SESSION['fname'], 0, 1)); ?>

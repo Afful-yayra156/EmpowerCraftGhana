@@ -1,348 +1,57 @@
+<?php
+session_start(); // Start the session
+include '../db/config.php'; // Include database connection
+
+// Check if user is logged in
+if (!isset($_SESSION['user_id'])) {
+    // Redirect to login page if not logged in
+    header("Location: login.php");
+    exit;
+}
+
+// Fetch orders from database
+$buyer_id = $_SESSION['user_id'];
+$sql = "SELECT o.order_id, o.order_date, o.total_amount, o.status, o.shipping_address,
+       o.shipping_method, o.tracking_number, o.notes,
+       s.title as service_name, s.price as service_price
+FROM orders o
+LEFT JOIN services s ON o.service_id = s.service_id
+WHERE o.buyer_id = ?
+ORDER BY o.order_date DESC";
+
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $buyer_id);
+$stmt->execute();
+$result = $stmt->get_result();
+
+// Create an array to store the orders
+$orders = [];
+while ($row = $result->fetch_assoc()) {
+    $orders[] = $row;
+}
+
+// Close statement
+$stmt->close();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Orders | EmpowerSkills Ghana</title>
-    <style>
-        :root {
-            --primary: #1e8765;
-            --primary-light: #e9f5f1;
-            --primary-dark: #145c44;
-            --accent: #3a7ca5;
-            --accent-light: #d6ebf7;
-            --neutral-dark: #333333;
-            --neutral-mid: #717171;
-            --neutral-light: #f7f9fa;
-            --shadow: rgba(0, 0, 0, 0.08);
-            --success: #4caf50;
-            --warning: #ff9800;
-            --danger: #f44336;
-            --info: #2196f3;
-        }
-        
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f3f9f7, #e3f2fd);
-            color: var(--neutral-dark);
-            line-height: 1.6;
-            min-height: 100vh;
-            padding: 20px;
-        }
-        
-        .container {
-            width: 100%;
-            max-width: 900px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 8px 30px var(--shadow);
-            overflow: hidden;
-        }
-        
-        .header {
-            background: linear-gradient(to right, var(--primary), var(--accent));
-            padding: 25px 0;
-            text-align: center;
-            position: relative;
-        }
-        
-        .header h2 {
-            color: white;
-            font-weight: 600;
-            font-size: 24px;
-            margin: 0;
-            letter-spacing: 0.3px;
-        }
-        
-        .nav {
-            display: flex;
-            justify-content: center;
-            background-color: white;
-            padding: 0;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-        }
-        
-        .nav a {
-            text-decoration: none;
-            color: var(--neutral-mid);
-            font-weight: 500;
-            padding: 16px 12px;
-            font-size: 14px;
-            transition: all 0.2s ease;
-            border-bottom: 2px solid transparent;
-        }
-        
-        .nav a:hover, .nav a.active {
-            color: var(--primary);
-            border-bottom: 2px solid var(--primary);
-        }
-        
-        .content {
-            padding: 30px;
-        }
-        
-        .order-list {
-            margin-top: 20px;
-        }
-        
-        .order-item {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px var(--shadow);
-            margin-bottom: 20px;
-            overflow: hidden;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        
-        .order-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-        
-        .order-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 20px;
-            background-color: var(--neutral-light);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-        }
-        
-        .order-id {
-            font-size: 14px;
-            color: var(--neutral-mid);
-        }
-        
-        .order-date {
-            font-size: 14px;
-            font-weight: 500;
-        }
-        
-        .order-content {
-            padding: 20px;
-        }
-        
-        .order-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 12px;
-            color: var(--neutral-dark);
-        }
-        
-        .order-details {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            margin-bottom: 16px;
-        }
-        
-        .order-detail {
-            flex: 1;
-            min-width: 200px;
-        }
-        
-        .detail-label {
-            font-size: 13px;
-            color: var(--neutral-mid);
-            margin-bottom: 4px;
-        }
-        
-        .detail-value {
-            font-size: 16px;
-            font-weight: 500;
-        }
-        
-        .order-footer {
-            padding: 12px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-top: 1px solid rgba(0, 0, 0, 0.05);
-        }
-        
-        .status-badge {
-            display: inline-block;
-            padding: 6px 12px;
-            border-radius: 50px;
-            font-size: 13px;
-            font-weight: 500;
-        }
-        
-        .status-delivered {
-            background-color: var(--success);
-            color: white;
-        }
-        
-        .status-processing {
-            background-color: var(--info);
-            color: white;
-        }
-        
-        .status-cancelled {
-            background-color: var(--danger);
-            color: white;
-        }
-        
-        .btn {
-            display: inline-block;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: none;
-        }
-        
-        .btn-primary {
-            background-color: var(--primary);
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background-color: var(--primary-dark);
-        }
-        
-        .btn-danger {
-            background-color: var(--danger);
-            color: white;
-        }
-        
-        .btn-danger:hover {
-            background-color: #d32f2f;
-        }
-        
-        .btn-outline {
-            background-color: transparent;
-            color: var(--primary);
-            border: 1px solid var(--primary);
-        }
-        
-        .btn-outline:hover {
-            background-color: var(--primary-light);
-        }
-        
-        .filter-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        
-        .filter-controls {
-            display: flex;
-            gap: 10px;
-        }
-        
-        .filter-select {
-            padding: 8px 12px;
-            border-radius: 6px;
-            border: 1px solid #dce1e4;
-            font-size: 14px;
-            color: var(--neutral-dark);
-        }
-        
-        .search-container {
-            position: relative;
-            width: 250px;
-        }
-        
-        .search-input {
-            width: 100%;
-            padding: 8px 12px 8px 36px;
-            border-radius: 6px;
-            border: 1px solid #dce1e4;
-            font-size: 14px;
-        }
-        
-        .search-icon {
-            position: absolute;
-            left: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 16px;
-            height: 16px;
-            fill: var(--neutral-mid);
-        }
-        
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--neutral-mid);
-        }
-        
-        .empty-icon {
-            width: 60px;
-            height: 60px;
-            fill: #ccc;
-            margin-bottom: 20px;
-        }
-        
-        .empty-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-        
-        .empty-text {
-            font-size: 15px;
-            margin-bottom: 20px;
-        }
-        
-        @media (max-width: 768px) {
-            .order-details {
-                flex-direction: column;
-                gap: 10px;
-            }
-            
-            .order-detail {
-                min-width: 100%;
-            }
-            
-            .filter-container {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 10px;
-            }
-            
-            .filter-controls {
-                flex-wrap: wrap;
-            }
-            
-            .search-container {
-                width: 100%;
-            }
-            
-            .nav {
-                overflow-x: auto;
-                justify-content: flex-start;
-            }
-            
-            .nav a {
-                flex: 0 0 auto;
-                white-space: nowrap;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="../assets/css/orders.css">
 </head>
 <body>
-
     <div class="container">
         <div class="header">
             <h2>Order History</h2>
         </div>
         
         <div class="nav">
-            <a href="dashboard.html">Dashboard</a>
-            <a href="services.html">Services</a>
-            <a href="listings.html">Listings</a>
+            <a href="dashboard.php">Dashboard</a>
+            <a href="services.php">Services</a>
+            <a href="checkout.php">checkout</a>
             <a href="orders.php" class="active">Orders</a>
             <a href="messages.php">Messages</a>
         </div>
@@ -352,9 +61,10 @@
                 <div class="filter-controls">
                     <select id="statusFilter" class="filter-select">
                         <option value="all">All Orders</option>
-                        <option value="Delivered">Delivered</option>
-                        <option value="Processing">Processing</option>
-                        <option value="Cancelled">Cancelled</option>
+                        <option value="delivered">Delivered</option>
+                        <option value="processing">Processing</option>
+                        <option value="cart">In Cart</option>
+                        <option value="cancelled">Cancelled</option>
                     </select>
                     <select id="dateFilter" class="filter-select">
                         <option value="newest">Newest First</option>
@@ -373,51 +83,26 @@
         </div>
     </div>
 
+    <div id="orderModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h3>Order Details</h3>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
     <script>
-        // Check if user is logged in
-        // let user = JSON.parse(localStorage.getItem("loggedInUser"));
-        
-        // if (!user) {
-        //     alert("Please log in first!");
-        //     window.location.href = "login.php";
-        // }
-        
-        // Sample orders data (Replace with API call in production)
-        let orders = [
-            { 
-                id: "ORD-2025-001", 
-                item: "Handmade Beaded Necklace", 
-                price: "50.00", 
-                status: "Delivered", 
-                date: "2025-02-10",
-                quantity: 1,
-                paymentMethod: "Mobile Money"
-            },
-            { 
-                id: "ORD-2025-002", 
-                item: "Wooden Carving - Ashanti Stool", 
-                price: "200.00", 
-                status: "Processing", 
-                date: "2025-02-12",
-                quantity: 1,
-                paymentMethod: "Card Payment"
-            },
-            { 
-                id: "ORD-2025-003", 
-                item: "Traditional Kente Cloth Bag", 
-                price: "85.00", 
-                status: "Processing", 
-                date: "2025-03-25",
-                quantity: 2,
-                paymentMethod: "Mobile Money"
-            }
-        ];
+        // Get orders data from PHP
+        let orders = <?php echo json_encode($orders); ?>;
         
         // Get elements
         const orderList = document.getElementById("orderList");
         const statusFilter = document.getElementById("statusFilter");
         const dateFilter = document.getElementById("dateFilter");
         const searchInput = document.getElementById("searchInput");
+        const modalContent = document.getElementById("modalContent");
+        const closeBtn = document.querySelector(".close-btn");
+
         
         // Add event listeners
         statusFilter.addEventListener("change", filterOrders);
@@ -426,12 +111,15 @@
         
         // Function to get status class
         function getStatusClass(status) {
+            status = status.toLowerCase();
             switch(status) {
-                case "Delivered":
+                case "delivered":
                     return "status-delivered";
-                case "Processing":
+                case "processing":
                     return "status-processing";
-                case "Cancelled":
+                case "cart":
+                    return "status-cart";
+                case "cancelled":
                     return "status-cancelled";
                 default:
                     return "";
@@ -467,46 +155,56 @@
                 const orderItem = document.createElement("div");
                 orderItem.classList.add("order-item");
                 
+                const paymentMethod = order.notes || "Not specified";
+                const serviceName = order.service_name || "Unknown Service";
+                
                 orderItem.innerHTML = `
                     <div class="order-header">
-                        <span class="order-id">${order.id}</span>
-                        <span class="order-date">${formatDate(order.date)}</span>
+                        <span class="order-id">Order #${order.order_id}</span>
+                        <span class="order-date">${formatDate(order.order_date)}</span>
                     </div>
                     <div class="order-content">
-                        <h3 class="order-title">${order.item}</h3>
+                        <h3 class="order-title">${serviceName}</h3>
                         <div class="order-details">
                             <div class="order-detail">
                                 <div class="detail-label">Price</div>
-                                <div class="detail-value">GHS ${order.price}</div>
+                                <div class="detail-value">GHS ${parseFloat(order.total_amount).toFixed(2)}</div>
                             </div>
                             <div class="order-detail">
                                 <div class="detail-label">Quantity</div>
-                                <div class="detail-value">${order.quantity}</div>
+                                <div class="detail-value">1</div>
                             </div>
                             <div class="order-detail">
                                 <div class="detail-label">Payment Method</div>
-                                <div class="detail-value">${order.paymentMethod}</div>
+                                <div class="detail-value">${paymentMethod}</div>
                             </div>
                         </div>
                     </div>
                     <div class="order-footer">
                         <span class="status-badge ${getStatusClass(order.status)}">${order.status}</span>
                         <div>
-                            ${order.status === "Processing" ? 
-                                `<button class="btn btn-danger" onclick="cancelOrder('${order.id}')">Cancel Order</button>` : 
-                                `<button class="btn btn-outline" onclick="viewOrderDetails('${order.id}')">View Details</button>`
+                            ${order.status.toLowerCase() === "cart" ? 
+                                `<button class="btn btn-primary" onclick="checkoutOrder(${order.order_id})">Checkout</button>` : ''}
+                            ${order.status.toLowerCase() === "processing" ? 
+                                `<button class="btn btn-danger" onclick="cancelOrder(${order.order_id})">Cancel Order</button>` : 
+                                `<button class="btn btn-outline" onclick="viewOrderDetails(${order.order_id})">View Details</button>`
                             }
                         </div>
+                        <button class="btn btn-danger" onclick="cancelOrder(${order.order_id})">Cancel Order</button>
+
                     </div>
                 `;
+
+                
                 
                 orderList.appendChild(orderItem);
             });
         }
         
+
         // Function to filter orders
         function filterOrders() {
-            const statusValue = statusFilter.value;
+            const statusValue = statusFilter.value.toLowerCase();
             const dateValue = dateFilter.value;
             const searchValue = searchInput.value.toLowerCase();
             
@@ -514,21 +212,23 @@
             
             // Filter by status
             if (statusValue !== "all") {
-                filteredOrders = filteredOrders.filter(order => order.status === statusValue);
+                filteredOrders = filteredOrders.filter(order => 
+                    order.status.toLowerCase() === statusValue
+                );
             }
             
             // Filter by search term
             if (searchValue) {
                 filteredOrders = filteredOrders.filter(order => 
-                    order.item.toLowerCase().includes(searchValue) || 
-                    order.id.toLowerCase().includes(searchValue)
+                    (order.service_name && order.service_name.toLowerCase().includes(searchValue)) || 
+                    order.order_id.toString().includes(searchValue)
                 );
             }
             
             // Sort by date
             filteredOrders.sort((a, b) => {
-                const dateA = new Date(a.date);
-                const dateB = new Date(b.date);
+                const dateA = new Date(a.order_date);
+                const dateB = new Date(b.order_date);
                 return dateValue === "newest" ? dateB - dateA : dateA - dateB;
             });
             
@@ -538,19 +238,63 @@
         // Function to cancel order
         function cancelOrder(orderId) {
             if (confirm("Are you sure you want to cancel this order?")) {
-                const orderIndex = orders.findIndex(o => o.id === orderId);
-                if (orderIndex >= 0) {
-                    orders[orderIndex].status = "Cancelled";
-                    filterOrders(); // Re-render with updated data
-                }
+                // Send AJAX request to cancel the order
+                fetch('../actions/update_order_status.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `order_id=${orderId}&status=cancelled`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update local data
+                        const orderIndex = orders.findIndex(o => o.order_id == orderId);
+                        if (orderIndex >= 0) {
+                            orders[orderIndex].status = "cancelled";
+                            filterOrders(); // Re-render with updated data
+                        }
+                        alert('Order has been cancelled');
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while updating the order.');
+                });
             }
+        }
+        
+        // Function to checkout order
+        function checkoutOrder(orderId) {
+            window.location.href = `checkout.php?order_id=${orderId}`;
         }
         
         // Function to view order details
         function viewOrderDetails(orderId) {
-            // In a real application, this would navigate to a detailed view of the order
-            alert(`Viewing details for order ${orderId}`);
-            // window.location.href = `order-details.html?id=${orderId}`;
+            window.location.href = `order-details.php?id=${orderId}`;
+        }
+
+         // Function to view order details
+         function viewOrderDetails(orderId) {
+            const order = orders.find(o => o.order_id === orderId);
+            modalContent.innerHTML = `
+                <h4>Order #${order.order_id}</h4>
+                <p><strong>Service:</strong> ${order.service_name}</p>
+                <p><strong>Status:</strong> ${order.status}</p>
+                <p><strong>Total:</strong> GHS ${parseFloat(order.total_amount).toFixed(2)}</p>
+                <p><strong>Payment Method:</strong> ${order.notes || "Not specified"}</p>
+            
+                <p><strong>Notes:</strong> ${order.notes || "No additional notes"}</p>
+            `;
+            document.getElementById('orderModal').style.display = "block";
+        }
+        
+        // Close modal
+        closeBtn.onclick = function() {
+            document.getElementById('orderModal').style.display = "none";
         }
         
         // Function to reset filters
@@ -563,7 +307,9 @@
         
         // Initial render
         filterOrders();
-    </script>
 
+
+
+    </script>
 </body>
 </html>

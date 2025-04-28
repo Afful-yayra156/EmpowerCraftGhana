@@ -184,12 +184,12 @@ function getServiceDetails($conn, $serviceId) {
     }
 }
 
-function getListingDetails($conn, $listingId) {
-    $sql = "SELECT l.*, u.user_id as seller_id FROM listings l 
+function getcheckoutDetails($conn, $checkoutId) {
+    $sql = "SELECT l.*, u.user_id as seller_id FROM checkout l 
             JOIN users u ON l.user_id = u.user_id 
-            WHERE l.listing_id = ? AND l.status = 'active'";
+            WHERE l.checkout_id = ? AND l.status = 'active'";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $listingId);
+    $stmt->bind_param("i", $checkoutId);
     $stmt->execute();
     $result = $stmt->get_result();
     
@@ -200,11 +200,11 @@ function getListingDetails($conn, $listingId) {
     }
 }
 
-function createOrderItem($conn, $orderId, $listingId, $sellerId, $quantity, $pricePerUnit) {
-    $sql = "INSERT INTO order_items (order_id, listing_id, seller_id, quantity, price_per_unit) 
+function createOrderItem($conn, $orderId, $checkoutId, $sellerId, $quantity, $pricePerUnit) {
+    $sql = "INSERT INTO order_items (order_id, checkout_id, seller_id, quantity, price_per_unit) 
             VALUES (?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("iiiid", $orderId, $listingId, $sellerId, $quantity, $pricePerUnit);
+    $stmt->bind_param("iiiid", $orderId, $checkoutId, $sellerId, $quantity, $pricePerUnit);
     
     return $stmt->execute();
 }
@@ -279,23 +279,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             exit;
         }
         
-        // If listing_id is provided, create order item
-        if (isset($_POST['listing_id'])) {
-            $listingId = intval($_POST['listing_id']);
+        // If checkout_id is provided, create order item
+        if (isset($_POST['checkout_id'])) {
+            $checkoutId = intval($_POST['checkout_id']);
             $quantity = isset($_POST['quantity']) ? intval($_POST['quantity']) : 1;
             
-            $listing = getListingDetails($conn, $listingId);
+            $checkout = getcheckoutDetails($conn, $checkoutId);
             
-            if (!$listing) {
-                $response['message'] = 'Listing not found or inactive';
+            if (!$checkout) {
+                $response['message'] = 'checkout not found or inactive';
                 echo json_encode($response);
                 exit;
             }
             
-            $sellerId = $listing['seller_id'];
-            $pricePerUnit = $listing['price'];
+            $sellerId = $checkout['seller_id'];
+            $pricePerUnit = $checkout['price'];
             
-            createOrderItem($conn, $orderId, $listingId, $sellerId, $quantity, $pricePerUnit);
+            createOrderItem($conn, $orderId, $checkoutId, $sellerId, $quantity, $pricePerUnit);
             
             // For simplicity, assuming one seller per order
             $payeeId = $sellerId;
@@ -539,9 +539,9 @@ else {
         $user = getUserDetails($conn, $_SESSION['user_id']);
     }
     
-    // Get service or listing details if provided in GET parameters
+    // Get service or checkout details if provided in GET parameters
     $service = null;
-    $listing = null;
+    $checkout = null;
     $itemType = null;
     $itemId = null;
     $amount = null;
@@ -554,13 +554,13 @@ else {
             $itemId = $serviceId;
             $amount = $service['price'];
         }
-    } else if (isset($_GET['listing_id'])) {
-        $listingId = intval($_GET['listing_id']);
-        $listing = getListingDetails($conn, $listingId);
-        if ($listing) {
-            $itemType = 'listing';
-            $itemId = $listingId;
-            $amount = $listing['price'];
+    } else if (isset($_GET['checkout_id'])) {
+        $checkoutId = intval($_GET['checkout_id']);
+        $checkout = getcheckoutDetails($conn, $checkoutId);
+        if ($checkout) {
+            $itemType = 'checkout';
+            $itemId = $checkoutId;
+            $amount = $checkout['price'];
         }
     }
 }
@@ -849,8 +849,8 @@ else {
         
         <div class="nav">
             <a href="dashboard.php">Dashboard</a>
-            <a href="services.html">Services</a>
-            <a href="listings.html">Listings</a>
+            <a href="services.php">Services</a>
+            <a href="checkout.php">checkout</a>
             <a href="orders.php">Orders</a>
             <a href="#" class="active">Checkout</a>
         </div>
@@ -864,13 +864,13 @@ else {
                 <div class="alert success"><?php echo $success; ?></div>
             <?php endif; ?>
             
-            <?php if ($itemType && ($service || $listing)): ?>
+            <?php if ($itemType && ($service || $checkout)): ?>
                 <div class="item-details">
                     <div class="item-title">
                         <?php if ($itemType == 'service'): ?>
                             <?php echo htmlspecialchars($service['title']); ?> (Service)
                         <?php else: ?>
-                            <?php echo htmlspecialchars($listing['title']); ?> (Product)
+                            <?php echo htmlspecialchars($checkout['title']); ?> (Product)
                         <?php endif; ?>
                     </div>
                     <div class="item-price">GHS <?php echo number_format($amount, 2); ?></div>
@@ -884,8 +884,8 @@ else {
                 
                 <?php if ($itemType == 'service'): ?>
                     <input type="hidden" name="service_id" value="<?php echo $itemId; ?>">
-                <?php elseif ($itemType == 'listing'): ?>
-                    <input type="hidden" name="listing_id" value="<?php echo $itemId; ?>">
+                <?php elseif ($itemType == 'checkout'): ?>
+                    <input type="hidden" name="checkout_id" value="<?php echo $itemId; ?>">
                     <input type="hidden" name="quantity" value="<?php echo isset($_GET['quantity']) ? intval($_GET['quantity']) : 1; ?>">
                 <?php endif; ?>
                 

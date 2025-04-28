@@ -62,12 +62,12 @@ function getOrders($conn, $userId) {
     // SQL query to get orders and their items
     $sql = "SELECT o.order_id, o.order_date, o.total_amount, o.status, o.shipping_address, 
                    o.shipping_method, o.tracking_number, o.notes,
-                   oi.order_item_id, oi.listing_id, oi.quantity, oi.price_per_unit, oi.status as item_status,
+                   oi.order_item_id, oi.checkout_id, oi.quantity, oi.price_per_unit, oi.status as item_status,
                    l.title as item_name, 
                    p.payment_method
             FROM orders o
             JOIN order_items oi ON o.order_id = oi.order_id
-            JOIN listings l ON oi.listing_id = l.listing_id
+            JOIN checkout l ON oi.checkout_id = l.checkout_id
             LEFT JOIN payments p ON p.reference_id = o.order_id AND p.payment_type = 'order'
             WHERE o.buyer_id = ?
             ORDER BY o.order_date DESC";
@@ -110,7 +110,7 @@ function getOrders($conn, $userId) {
         // Add this item to the order
         $orders[$orderMap[$orderId]]['items'][] = [
             'order_item_id' => $row['order_item_id'],
-            'listing_id' => $row['listing_id'],
+            'checkout_id' => $row['checkout_id'],
             'item' => $row['item_name'],
             'quantity' => $row['quantity'],
             'price' => $row['price_per_unit'],
@@ -160,7 +160,7 @@ function cancelOrder($conn, $userId, $orderId) {
         echo json_encode(['success' => true, 'message' => 'Order cancelled successfully']);
     } else {
         header('Content-Type: application/json');
-        echo json_encode(['error' => 'Failed to cancel order or order not in cancellable state']);
+        echo json_encode(['error' => 'Failed to services.php or order not in cancellable state']);
     }
 }
 
@@ -175,12 +175,12 @@ function filterOrders($conn, $userId, $filterData) {
     // Base SQL query
     $sql = "SELECT o.order_id, o.order_date, o.total_amount, o.status, o.shipping_address, 
                    o.shipping_method, o.tracking_number, o.notes,
-                   oi.order_item_id, oi.listing_id, oi.quantity, oi.price_per_unit, oi.status as item_status,
+                   oi.order_item_id, oi.checkout_id, oi.quantity, oi.price_per_unit, oi.status as item_status,
                    l.title as item_name, 
                    p.payment_method
             FROM orders o
             JOIN order_items oi ON o.order_id = oi.order_id
-            JOIN listings l ON oi.listing_id = l.listing_id
+            JOIN checkout l ON oi.checkout_id = l.checkout_id
             LEFT JOIN payments p ON p.reference_id = o.order_id AND p.payment_type = 'order'
             WHERE o.buyer_id = ?";
     
@@ -244,7 +244,7 @@ function filterOrders($conn, $userId, $filterData) {
         // Add this item to the order
         $orders[$orderMap[$orderId]]['items'][] = [
             'order_item_id' => $row['order_item_id'],
-            'listing_id' => $row['listing_id'],
+            'checkout_id' => $row['checkout_id'],
             'item' => $row['item_name'],
             'quantity' => $row['quantity'],
             'price' => $row['price_per_unit'],

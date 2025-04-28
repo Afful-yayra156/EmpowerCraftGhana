@@ -280,3 +280,45 @@ textarea.form-control {
     align-items: center;
     gap: 15px;
 }
+
+.container.mt-5 .row {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+/* Adjust columns to ensure they don't exceed the width */
+.col-md-6 {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+/* Optional: Styling for inputs to keep them aligned */
+input.form-control, select.form-control {
+    width: 100%; /* Makes the input and select fill the column */
+    max-width: 200px; /* Optional: limits the width */
+}
+.carousel-controls {
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    transform: translateY(-50%);
+    padding: 0 10px;
+}
+
+.carousel-controls button {
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 50%;
+}
+
+.carousel-controls button:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}

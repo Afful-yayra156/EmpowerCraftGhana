@@ -71,11 +71,11 @@ CREATE TABLE `conversations` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `listings`
+-- Table structure for table `checkout`
 --
 
-CREATE TABLE `listings` (
-  `listing_id` int(11) NOT NULL,
+CREATE TABLE `checkout` (
+  `checkout_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `category_id` int(11) NOT NULL,
   `title` varchar(100) NOT NULL,
@@ -91,12 +91,12 @@ CREATE TABLE `listings` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `listing_images`
+-- Table structure for table `checkout_images`
 --
 
-CREATE TABLE `listing_images` (
+CREATE TABLE `checkout_images` (
   `image_id` int(11) NOT NULL,
-  `listing_id` int(11) NOT NULL,
+  `checkout_id` int(11) NOT NULL,
   `image_url` varchar(255) NOT NULL,
   `is_primary` tinyint(1) DEFAULT 0,
   `upload_date` timestamp NOT NULL DEFAULT current_timestamp()
@@ -162,7 +162,7 @@ CREATE TABLE `orders` (
 CREATE TABLE `order_items` (
   `order_item_id` int(11) NOT NULL,
   `order_id` int(11) NOT NULL,
-  `listing_id` int(11) NOT NULL,
+  `checkout_id` int(11) NOT NULL,
   `seller_id` int(11) NOT NULL,
   `quantity` int(11) NOT NULL,
   `price_per_unit` decimal(10,2) NOT NULL,
@@ -199,7 +199,7 @@ CREATE TABLE `reviews` (
   `review_id` int(11) NOT NULL,
   `reviewer_id` int(11) NOT NULL,
   `reviewed_id` int(11) NOT NULL,
-  `reference_type` enum('service','listing','user') NOT NULL,
+  `reference_type` enum('service','checkout','user') NOT NULL,
   `reference_id` int(11) NOT NULL,
   `rating` decimal(3,2) NOT NULL CHECK (`rating` >= 1 and `rating` <= 5),
   `comment` text DEFAULT NULL,
@@ -309,19 +309,19 @@ ALTER TABLE `conversations`
   ADD KEY `last_message_id` (`last_message_id`);
 
 --
--- Indexes for table `listings`
+-- Indexes for table `checkout`
 --
-ALTER TABLE `listings`
-  ADD PRIMARY KEY (`listing_id`),
+ALTER TABLE `checkout`
+  ADD PRIMARY KEY (`checkout_id`),
   ADD KEY `user_id` (`user_id`),
-  ADD KEY `idx_listings_category` (`category_id`);
+  ADD KEY `idx_checkout_category` (`category_id`);
 
 --
--- Indexes for table `listing_images`
+-- Indexes for table `checkout_images`
 --
-ALTER TABLE `listing_images`
+ALTER TABLE `checkout_images`
   ADD PRIMARY KEY (`image_id`),
-  ADD KEY `listing_id` (`listing_id`);
+  ADD KEY `checkout_id` (`checkout_id`);
 
 --
 -- Indexes for table `messages`
@@ -352,7 +352,7 @@ ALTER TABLE `orders`
 ALTER TABLE `order_items`
   ADD PRIMARY KEY (`order_item_id`),
   ADD KEY `order_id` (`order_id`),
-  ADD KEY `listing_id` (`listing_id`),
+  ADD KEY `checkout_id` (`checkout_id`),
   ADD KEY `seller_id` (`seller_id`);
 
 --
@@ -420,15 +420,15 @@ ALTER TABLE `conversations`
   MODIFY `conversation_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `listings`
+-- AUTO_INCREMENT for table `checkout`
 --
-ALTER TABLE `listings`
-  MODIFY `listing_id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `checkout`
+  MODIFY `checkout_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `listing_images`
+-- AUTO_INCREMENT for table `checkout_images`
 --
-ALTER TABLE `listing_images`
+ALTER TABLE `checkout_images`
   MODIFY `image_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
@@ -512,17 +512,17 @@ ALTER TABLE `conversations`
   ADD CONSTRAINT `conversations_ibfk_3` FOREIGN KEY (`last_message_id`) REFERENCES `messages` (`message_id`) ON DELETE SET NULL;
 
 --
--- Constraints for table `listings`
+-- Constraints for table `checkout`
 --
-ALTER TABLE `listings`
-  ADD CONSTRAINT `listings_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `listings_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `categories` (`category_id`) ON DELETE CASCADE;
+ALTER TABLE `checkout`
+  ADD CONSTRAINT `checkout_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `checkout_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `categories` (`category_id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `listing_images`
+-- Constraints for table `checkout_images`
 --
-ALTER TABLE `listing_images`
-  ADD CONSTRAINT `listing_images_ibfk_1` FOREIGN KEY (`listing_id`) REFERENCES `listings` (`listing_id`) ON DELETE CASCADE;
+ALTER TABLE `checkout_images`
+  ADD CONSTRAINT `checkout_images_ibfk_1` FOREIGN KEY (`checkout_id`) REFERENCES `checkout` (`checkout_id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `messages`
