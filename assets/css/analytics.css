@@ -1,0 +1,53 @@
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 280px;
+    height: 100vh;
+    background: linear-gradient(135deg, #4CAF50, #2196F3);
+    color: white;
+    padding: 24px;
+    box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+    z-index: 10;
+  }
+  
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 40px;
+  }
+  
+  .logo-icon {
+    font-size: 30px;
+  }
+  
+  .sidebar h2 {
+    font-size: 24px;
+    font-weight: 600;
+  }
+
+  
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 8px 0;
+    text-decoration: none;
+    color: white;
+    padding: 14px 18px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+  }
+  
+  .nav-item:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: translateX(5px);
+  }
+  
+  .nav-item.active {
+    background-color: rgba(255, 255, 255, 0.3);
+  }
+
+  
