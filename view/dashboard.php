@@ -357,7 +357,7 @@ $stmt->fetch();
       <?php } ?>
     </section>
 
-    <!-- <div class="dashboard-grid">
+    <div class="dashboard-grid">
       <section class="messages-section">
         <div class="section-header">
           <h2>Recent Messages</h2>
@@ -395,43 +395,37 @@ $stmt->fetch();
         </div>
       </section>
 
-      <section class="upcoming-section">
-        <div class="section-header">
-          <h2>Upcoming Bookings</h2>
-          <a href="orders.php">View calendar</a>
-        </div>
-        <div class="upcoming-event">
-          <div class="event-date">
-            <div class="day">28</div>
-            <div class="month">APR</div>
-          </div>
-          <div class="event-details">
-            <h4>Weaving Workshop</h4>
-            <p>10:00 AM - 12:00 PM</p>
-          </div>
-        </div>
-        <div class="upcoming-event">
-          <div class="event-date">
-            <div class="day">03</div>
-            <div class="month">MAY</div>
-          </div>
-          <div class="event-details">
-            <h4>Pottery Delivery</h4>
-            <p>2:30 PM - 3:30 PM</p>
-          </div>
-        </div>
-        <div class="upcoming-event">
-          <div class="event-date">
-            <div class="day">09</div>
-            <div class="month">MAY</div>
-          </div>
-          <div class="event-details">
-            <h4>Woodcraft Class</h4>
-            <p>1:00 PM - 4:00 PM</p>
-          </div>
-        </div>
-      </section>
-    </div> -->
+<section class="upcoming-section">
+    <div class="section-header">
+        <h2>Upcoming Bookings</h2>
+        <a href="orders.php">View calendar</a>
+    </div>
+
+    <?php if (!empty($upcoming_bookings)): ?>
+        <?php foreach ($upcoming_bookings as $booking): ?>
+            <?php
+                $date = strtotime($booking['order_date']);
+                $day = date('d', $date);
+                $month = strtoupper(date('M', $date));
+                $time = date('g:i A', $date);
+            ?>
+            <div class="upcoming-event">
+                <div class="event-date">
+                    <div class="day"><?php echo $day; ?></div>
+                    <div class="month"><?php echo $month; ?></div>
+                </div>
+                <div class="event-details">
+                    <h4><?php echo htmlspecialchars($booking['title']); ?></h4>
+                    <p><?php echo $time; ?></p>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    <?php else: ?>
+        <p style="padding: 10px;">No upcoming bookings yet.</p>
+    <?php endif; ?>
+</section>
+
+    </div>
   </main>
 </body>
 </html>
