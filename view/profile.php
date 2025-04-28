@@ -88,18 +88,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <i class="fas fa-star"></i>
         <span class="nav-text">Reviews</span>
       </a>
+      <a href="services.php" class="nav-item">
+        <i class="fas fa-shopping-cart"></i>
+        <span class="nav-text">Services</span>
+      </a>
       <a href="orders.php" class="nav-item">
         <i class="fas fa-shopping-cart"></i>
         <span class="nav-text">Orders</span>
       </a>
-      <a href="#" class="nav-item">
-        <i class="fas fa-chart-line"></i>
-        <span class="nav-text">Analytics</span>
-      </a>
-      <a href="#" class="nav-item">
-        <i class="fas fa-cog"></i>
-        <span class="nav-text">Settings</span>
-      </a>
+      <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
+        <a href="analytics.php" class="nav-item active">
+          <i class="fas fa-chart-line"></i>
+          <span class="nav-text">Analytics</span>
+        </a>
+      <?php endif; ?>
+
       <a href="logout.php" class="nav-item">
         <i class="fas fa-sign-out-alt"></i>
         <span class="nav-text">Logout</span>

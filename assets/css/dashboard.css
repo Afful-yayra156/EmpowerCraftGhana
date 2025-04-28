@@ -327,6 +327,7 @@ body {
   z-index: -1;
 }
 
+
 @keyframes float {
   0% {
     transform: translateY(0px) rotate(0deg);

@@ -82,17 +82,16 @@ if ($userRole == 'artisan' || $userRole == 'client') {
     $stmt_services->close();
     
 // Get total orders placed on *your* services
-    $stmt_bookings = $conn->prepare(
-      "SELECT COUNT(*) AS total_bookings
-      FROM orders o
-      JOIN services s ON o.service_id = s.service_id
-      WHERE s.user_id = ?"
-    );
-    $stmt_bookings->bind_param("i", $user_id);
-    $stmt_bookings->execute();
-    $stmt_bookings->bind_result($totaluserBookings);
-    $stmt_bookings->fetch();
-    $stmt_bookings->close();
+$stmt_bookings = $conn->prepare(
+  "SELECT COUNT(*) AS total_bookings
+   FROM orders
+   WHERE buyer_id = ?"
+);
+$stmt_bookings->bind_param("i", $user_id);
+$stmt_bookings->execute();
+$stmt_bookings->bind_result($totaluserBookings);
+$stmt_bookings->fetch();
+$stmt_bookings->close();
 
     
     // Get user's reviews
@@ -131,6 +130,38 @@ $stmt->bind_param("i", $user_id); // Bind the buyer_id parameter
 $stmt->execute();
 $stmt->bind_result($num_services);
 $stmt->fetch();
+$stmt->close();
+
+
+// Fetch top 2 services added by the user
+$stmt_services = $conn->prepare(
+    "SELECT title, creation_date 
+     FROM services 
+     WHERE user_id = ?
+     ORDER BY creation_date DESC 
+     LIMIT 2"
+);
+$stmt_services->bind_param("i", $user_id);
+$stmt_services->execute();
+$result_services = $stmt_services->get_result();
+$user_services = $result_services->fetch_all(MYSQLI_ASSOC);
+$stmt_services->close();
+
+// Fetch top 2 cart orders by the user
+$stmt_orders = $conn->prepare(
+    "SELECT o.order_date, s.title 
+     FROM orders o
+     JOIN services s ON o.service_id = s.service_id
+     WHERE o.buyer_id = ? AND o.status = 'cart'
+     ORDER BY o.order_date DESC 
+     LIMIT 2"
+);
+$stmt_orders->bind_param("i", $user_id);
+$stmt_orders->execute();
+$result_orders = $stmt_orders->get_result();
+$user_cart_orders = $result_orders->fetch_all(MYSQLI_ASSOC);
+$stmt_orders->close();
+
 ?>
 
 <!DOCTYPE html>
@@ -202,7 +233,7 @@ $stmt->fetch();
         <p>Here's what's happening with your craft business</p>
       </div>
       <div class="user-profile">
-        <div class="notification-bell">
+        <div class="notification-bell" title="<?php echo $num_services; ?> service(s) added to cart">
           <i class="fas fa-shopping-cart"></i>
           <span class="notification-badge"><?php echo $num_services; ?></span>
         </div>
@@ -210,6 +241,7 @@ $stmt->fetch();
           <?php echo htmlspecialchars(substr($_SESSION['fname'], 0, 1)); ?>
         </div>
       </div>
+
     </section>
 
     <section class="summary">
@@ -336,7 +368,7 @@ $stmt->fetch();
           <div class="decoration-shape"></div>
         </div>
         <div class="summary-box">
-          <h3><i class="fas fa-calendar-check"></i> My Bookings</h3>
+          <h3><i class="fas fa-calendar-check"></i> My Orders</h3>
           <p><?php echo $totaluserBookings; ?></p>
           <div class="trend">
             <i class="fas fa-arrow-up"></i> 
@@ -359,37 +391,56 @@ $stmt->fetch();
     <div class="dashboard-grid">
       <section class="messages-section">
         <div class="section-header">
-          <h2>Recent Messages</h2>
-          <a href="messages.php">View all</a>
+          <h2>Quick Overview</h2>
+          <!-- <a href="messages.php">View all</a> -->
         </div>
         <div class="message">
           <div class="message-icon">
-            <i class="fas fa-envelope"></i>
+            <i class="fas fa-store"></i>
           </div>
           <div class="message-content">
-            <h4>New Inquiry</h4>
-            <p>You have a new inquiry for your Kente bag.</p>
-            <div class="message-time">2 hours ago</div>
+          <h4 style="margin: 20px 0 10px;">Services I provide</h4>
+            <?php if (!empty($user_services)): ?>
+            <?php foreach ($user_services as $service): ?>
+              <div class="message">
+                <div class="message-icon">
+                  <i class="fas fa-shopping-cart"></i>
+                </div>
+                <div class="message-content">
+                  <h4><?php echo htmlspecialchars($service['title']); ?></h4>
+                  <p>Added on <?php echo date('M d, Y', strtotime($service['creation_date'])); ?></p>
+                </div>
+              </div>
+            <?php endforeach; ?>
+          <?php else: ?>
+            <p>No services added yet.</p>
+          <?php endif; ?>
+            
           </div>
         </div>
-        <div class="message">
-          <div class="message-icon">
-            <i class="fas fa-check-circle"></i>
-          </div>
-          <div class="message-content">
-            <h4>Booking Confirmed</h4>
-            <p>Booking confirmed for Woodcraft Repair.</p>
-            <div class="message-time">Yesterday</div>
-          </div>
-        </div>
+
         <div class="message">
           <div class="message-icon">
             <i class="fas fa-star"></i>
           </div>
           <div class="message-content">
-            <h4>New Review</h4>
-            <p>Kofi left a 5-star review on your Beaded Jewelry.</p>
-            <div class="message-time">2 days ago</div>
+          <h4 style="margin: 20px 0 10px;">My Cart Orders</h4>
+          <?php if (!empty($user_cart_orders)): ?>
+            <?php foreach ($user_cart_orders as $order): ?>
+              <div class="message">
+                <div class="message-icon">
+                  <i class="fas fa-shopping-cart"></i>
+                </div>
+                <div class="message-content">
+                  <h4><?php echo htmlspecialchars($order['title']); ?></h4>
+                  <p>Added to cart on <?php echo date('M d, Y', strtotime($order['order_date'])); ?></p>
+                </div>
+              </div>
+                <?php endforeach; ?>
+              <?php else: ?>
+                <p>No cart orders yet.</p>
+              <?php endif; ?>
+            
           </div>
         </div>
       </section>
