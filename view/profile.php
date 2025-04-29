@@ -43,6 +43,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 
 
+// Assuming you have a connection to your database in $conn
+$user_id = $_SESSION['user_id'];
+$sql = "SELECT r.rating, r.comment, r.creation_date, u.first_name, u.last_name
+        FROM reviews r
+        JOIN users u ON r.reviewer_id = u.user_id
+        WHERE r.reviewed_id = ?
+        ORDER BY r.rating DESC, r.creation_date DESC
+        LIMIT 5";
+
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $user_id);  // Bind the user_id
+$stmt->execute();
+$result = $stmt->get_result();
+
+
+
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -157,21 +174,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </div>
 
     <section class="reviews-comments">
-      <h2>Reviews</h2>
-      <div class="review">
-        <strong>Akwesi B. ⭐⭐⭐⭐⭐</strong>
-        <p>Excellent craftsmanship. Highly recommend!</p>
-      </div>
-      <div class="review">
-        <strong>Nana Yaa ⭐⭐⭐⭐</strong>
-        <p>Delivery took a bit long, but the product is great.</p>
-      </div>
-
-      <h3>Leave a Review</h3>
-      <form>
-        <textarea placeholder="Write your review here..."></textarea>
-        <button type="submit">Submit</button>
-      </form>
+      <?php
+    // Display reviews
+      if ($result->num_rows > 0) {
+          while ($row = $result->fetch_assoc()) {
+              $rating = str_repeat("⭐", round($row['rating']));  // Display stars based on rating
+              echo "<div class='review'>";
+              echo "<strong>" . htmlspecialchars($row['first_name']) . " " . htmlspecialchars($row['last_name']) . " $rating</strong>";
+              echo "<p>" . htmlspecialchars($row['comment']) . "</p>";
+              echo "<small>Reviewed on: " . $row['creation_date'] . "</small>";
+              echo "</div>";
+          }
+      } else {
+          echo "<p>No reviews yet.</p>";
+      }
+      ?>
     </section>
   </main>
   
