@@ -9,8 +9,8 @@ $db_pass = "";
 $db_name = "empowerhub";
 
 // Flutterwave API settings
-$flw_public_key = "FLWPUBK_TEST-xxxxxxxxxxxxxxxxxxxxx-X"; // Replace with your actual Flutterwave public key
-$flw_secret_key = "FLWSECK_TEST-xxxxxxxxxxxxxxxxxxxxx-X"; // Replace with your actual Flutterwave secret key
+$flw_public_key = "pk_live_2c0d8c6c49ed7ed7587fd4b755b4bbff5d5dbad6"; // Replace with your actual Flutterwave public key
+$flw_secret_key = "sk_live_f4cb0a9bbbc39c6e1b54e9a037cc61faa4b05a10"; // Replace with your actual Flutterwave secret key
 
 // Connect to database
 $conn = new mysqli($db_host, $db_user, $db_pass, $db_name);

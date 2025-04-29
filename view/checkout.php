@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout | EmpowerSkills Ghana</title>
-    <script src="https://checkout.flutterwave.com/v3.js"></script>
+    <script src="https://js.paystack.co/v2/inline.js"></script>
     <style>
         :root {
             --primary: #1e8765;
@@ -242,7 +242,6 @@
     </style>
 </head>
 <body>
-
     <div class="container">
         <div class="header">
             <h2>Checkout</h2>
@@ -253,7 +252,6 @@
             <a href="services.php">Services</a>
             <a href="checkout.php">Checkout</a>
             <a href="orders.php">Orders</a>
-
         </div>
 
         <div class="form-container">
@@ -284,29 +282,12 @@
             <div class="payment-options">
                 <div class="payment-options-title">Select Payment Method</div>
                 <div class="payment-method-selector">
-                    <div class="payment-method-option active" id="cardOption" onclick="selectPaymentMethod('flutterwave')">
+                    <div class="payment-method-option active" id="cardOption" onclick="selectPaymentMethod('card')">
                         Card/Bank
                     </div>
                     <div class="payment-method-option" id="mobileOption" onclick="selectPaymentMethod('mobile_money')">
                         Mobile Money
                     </div>
-                </div>
-            </div>
-
-            <!-- Mobile Money Fields (Hidden Initially) -->
-            <div id="mobileMoneyFields" class="hidden">
-                <div class="form-group">
-                    <label for="network">Mobile Money Network</label>
-                    <select id="network">
-                        <option value="mtn">MTN Mobile Money</option>
-                        <option value="vodafone">Vodafone Cash</option>
-                        <option value="airteltigo">AirtelTigo Money</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="receiverPhone">Receiver's Phone Number</label>
-                    <input type="tel" id="receiverPhone" placeholder="Enter receiver's phone number">
                 </div>
             </div>
 
@@ -316,26 +297,23 @@
                 <svg class="lock-icon" viewBox="0 0 24 24">
                     <path d="M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.9,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z" />
                 </svg>
-                Secured by Flutterwave
+                Secured by Paystack
             </div>
         </div>
     </div>
 
     <script>
-        let selectedPaymentMethod = "flutterwave";
+        let selectedPaymentMethod = "card";
         
         function selectPaymentMethod(method) {
             selectedPaymentMethod = method;
-            let mobileMoneyFields = document.getElementById("mobileMoneyFields");
             let cardOption = document.getElementById("cardOption");
             let mobileOption = document.getElementById("mobileOption");
             
             if (method === "mobile_money") {
-                mobileMoneyFields.classList.remove("hidden");
                 cardOption.classList.remove("active");
                 mobileOption.classList.add("active");
             } else {
-                mobileMoneyFields.classList.add("hidden");
                 cardOption.classList.add("active");
                 mobileOption.classList.remove("active");
             }
@@ -352,62 +330,40 @@
                 return;
             }
 
-            if (selectedPaymentMethod === "mobile_money") {
-                let network = document.getElementById("network").value;
-                let receiverPhone = document.getElementById("receiverPhone").value.trim();
+            // Convert amount to kobo (Paystack expects amount in smallest currency unit, i.e., pesewas for GHS)
+            let amountInPesewas = parseFloat(amount) * 100;
 
-                if (receiverPhone === "") {
-                    alert("Please enter the receiver's phone number.");
-                    return;
+            let handler = PaystackPop.setup({
+                key: "pk_live_2c0d8c6c49ed7ed7587fd4b755b4bbff5d5dbad6", // Replace with your Paystack public key
+                email: email,
+                amount: amountInPesewas,
+                currency: "GHS",
+                ref: "EmpowerSkills-" + Math.floor(Math.random() * 1000000),
+                metadata: {
+                    custom_fields: [
+                        {
+                            display_name: "Full Name",
+                            variable_name: "full_name",
+                            value: fullName
+                        },
+                        {
+                            display_name: "Phone Number",
+                            variable_name: "phone_number",
+                            value: phone
+                        }
+                    ]
+                },
+                callback: function(response) {
+                    // Handle successful payment
+                    window.location.href = "payment_success.html?reference=" + response.reference;
+                },
+                onClose: function() {
+                    alert("Payment window closed.");
                 }
+            });
 
-                let mobileMoneyType = "mobilemoneyghana"; 
-
-                FlutterwaveCheckout({
-                    public_key: "FLWPUBK_TEST-xxxxxxxxxxxxxxxxxxxxx-X", // Replace with your Flutterwave public key
-                    tx_ref: "EmpowerSkills-" + Math.floor(Math.random() * 1000000),
-                    amount: amount,
-                    currency: "GHS",
-                    payment_options: mobileMoneyType,
-                    redirect_url: "payment_success.html",
-                    customer: {
-                        email: email,
-                        phone_number: phone,
-                        name: fullName,
-                    },
-                    meta: {
-                        receiver_phone: receiverPhone,
-                        network: network,
-                    },
-                    customizations: {
-                        title: "EmpowerSkills Ghana",
-                        description: "Payment via Mobile Money",
-                        logo: "https://yourwebsite.com/logo.png",
-                    },
-                });
-
-            } else {
-                FlutterwaveCheckout({
-                    public_key: "FLWPUBK_TEST-xxxxxxxxxxxxxxxxxxxxx-X", // Replace with your Flutterwave public key
-                    tx_ref: "EmpowerSkills-" + Math.floor(Math.random() * 1000000),
-                    amount: amount,
-                    currency: "GHS",
-                    payment_options: "card, banktransfer, ussd",
-                    redirect_url: "payment_success.html",
-                    customer: {
-                        email: email,
-                        phone_number: phone,
-                        name: fullName,
-                    },
-                    customizations: {
-                        title: "EmpowerSkills Ghana",
-                        description: "Payment via Card/Bank Transfer",
-                        logo: "https://yourwebsite.com/logo.png",
-                    },
-                });
-            }
+            handler.openIframe();
         }
     </script>
-
 </body>
 </html>
