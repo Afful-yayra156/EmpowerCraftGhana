@@ -406,7 +406,7 @@ $stmt_orders->close();
             <i class="fas fa-store"></i>
           </div>
           <div class="message-content">
-          <h4 style="margin: 20px 0 10px;">Services I provide</h4>
+          <h4 style="margin: 20px 0 10px;">My Services</h4>
             <?php if (!empty($user_services)): ?>
             <?php foreach ($user_services as $service): ?>
               <div class="message">
