@@ -12,6 +12,9 @@ $stmt->execute();
 $result = $stmt->get_result();
 $user = $result->fetch_assoc();
 
+// Set default profile picture if none exists
+$profilePicture = $user['profile_picture'] ? '../' . $user['profile_picture'] : '../assets/images/default-avatar.png';
+
 // Update user info when form is submitted
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $full_name = $_POST['full_name'];
@@ -40,7 +43,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 
 
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -53,6 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   
 </head>
 <body>
+
   <!-- Background shapes and decorations -->
   <div class="bg-shape circle circle-1"></div>
   <div class="bg-shape circle circle-2"></div>
@@ -72,11 +75,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       <h2>EmpowerCraft</h2>
     </div>
     <nav>
-      <a href="dashboard.php" class="nav-item active">
+      <a href="dashboard.php" class="nav-item">
         <i class="fas fa-home"></i>
         <span class="nav-text">Dashboard</span>
       </a>
-      <a href="profile.php" class="nav-item">
+      <a href="profile.php" class="nav-item active">
         <i class="fas fa-user"></i>
         <span class="nav-text">My Profile</span>
       </a>
@@ -88,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <i class="fas fa-star"></i>
         <span class="nav-text">Reviews</span>
       </a>
-      <a href="services.php" class="nav-item">
+            <a href="services.php" class="nav-item">
         <i class="fas fa-shopping-cart"></i>
         <span class="nav-text">Services</span>
       </a>
@@ -97,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <span class="nav-text">Orders</span>
       </a>
       <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
-        <a href="analytics.php" class="nav-item active">
+        <a href="analytics.php" class="nav-item">
           <i class="fas fa-chart-line"></i>
           <span class="nav-text">Analytics</span>
         </a>
@@ -113,13 +116,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   <main class="profile-main-full">
     <section class="profile-header">
       <div class="avatar-container">
-        <img src="<?php echo htmlspecialchars($user['profile_picture']); ?>" alt="User Avatar" class="avatar" id="profile-avatar"/>
-        <label for="avatar-upload" class="change-avatar" title="Change Profile Picture">📷</label>
-        <input type="file" id="avatar-upload" accept="image/*"/>
+        <form id="upload-form" action="../actions/upload_profile_picture.php" method="POST" enctype="multipart/form-data">
+        <img src="../actions/<?php echo htmlspecialchars($user['profile_picture']); ?>" alt="User Avatar" class="avatar" id="profile-avatar" />
+
+          <label for="avatar-upload" class="change-avatar" title="Change Profile Picture">📷</label>
+          <input type="file" id="avatar-upload" name="profile_picture" accept="image/*" style="display: none;"/>
+        </form>
       </div>
       <div>
         <h1><?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?></h1>
         <p>Artisan - Woodwork & Decor</p>
+
       </div>
     </section>
 
@@ -140,6 +147,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <h2>Edit Profile</h2>
         <form method="post">
           <input type="text" name="full_name" placeholder="Full Name" value="<?php echo htmlspecialchars($user['first_name'] . ' ' . $user['last_name']); ?>" required/>
+          <input type="email" name="email" placeholder="Email" value="<?php echo htmlspecialchars($user['email']); ?>" required/>
           <input type="text" name="phone_number" placeholder="Phone Number" value="<?php echo htmlspecialchars($user['phone_number']); ?>" required/>
           <input type="text" name="location" placeholder="Location" value="<?php echo htmlspecialchars($user['location']); ?>" required/>
           <textarea name="bio" placeholder="Bio"><?php echo htmlspecialchars($user['bio']); ?></textarea>
@@ -147,9 +155,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </form>
       </section>
     </div>
-
-    <!-- Reviews section remains the same -->
-
 
     <section class="reviews-comments">
       <h2>Reviews</h2>
@@ -187,6 +192,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
           
           // Show success notification
           showToast('Profile picture updated successfully!');
+          
+          // Submit the form to upload the image
+          document.getElementById('upload-form').submit();
         };
         
         // Read the image file as a data URL
@@ -205,6 +213,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         toast.style.display = 'none';
       }, 3000);
     }
+
+
+    document.getElementById('avatar-upload').addEventListener('change', function() {
+    const fileInput = this;
+    const form = document.getElementById('upload-form');
+    const avatar = document.getElementById('profile-avatar');
+
+    if (fileInput.files && fileInput.files[0]) {
+        // Preview the selected image immediately
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            avatar.src = e.target.result;
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+
+        // Automatically submit the form after selecting a file
+        form.submit();
+    }
+});
   </script>
 </body>
 </html>

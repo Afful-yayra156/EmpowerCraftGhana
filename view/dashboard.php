@@ -50,13 +50,16 @@ if ($userRole == 'admin') {
     }
     
     // Get total bookings
-    $sql_bookings = "SELECT COUNT(*) AS total_bookings FROM bookings";
-    $result_bookings = $conn->query($sql_bookings);
-    handleQueryError($conn, $sql_bookings);
+    $sql_orders = "SELECT COUNT(DISTINCT buyer_id) AS total_bookings FROM orders WHERE service_id = ? AND status = 'cart'";
+    $stmt_orders = $conn->prepare($sql_orders);
+    $stmt_orders->bind_param("i", $service_id); // Assuming you're looking for a specific service
+    $stmt_orders->execute();
+    $result_orders = $stmt_orders->get_result();
     
-    if ($result_bookings && $row_bookings = $result_bookings->fetch_assoc()) {
-        $totalBookings = $row_bookings['total_bookings'];
+    if ($result_orders && $row_orders = $result_orders->fetch_assoc()) {
+        $totalCartAdditions = $row_orders['total_bookings'];
     }
+    
     
     // Get total reviews
     $sql_reviews = "SELECT COUNT(*) AS total_reviews FROM reviews";
@@ -286,7 +289,7 @@ $stmt_orders->close();
 
     </section>
 
-      <div class="dashboard-grid">
+<div class="dashboard-grid">
   <section class="messages-section">
     <div class="section-header">
       <h2>Recent Messages</h2>
@@ -314,12 +317,14 @@ $stmt_orders->close();
         </div>
       </div>
     <?php endif; ?>
+
+    
                
     
         
       </section>
 
-      <section class="upcoming-section">
+      <!-- <section class="upcoming-section">
         <div class="section-header">
           <h2>Upcoming Bookings</h2>
           <a href="orders.php">View calendar</a>
@@ -354,8 +359,10 @@ $stmt_orders->close();
             <p>1:00 PM - 4:00 PM</p>
           </div>
         </div>
-      </section>
+      </section> -->
     </div>
+    </div>
+    
       <?php } else { ?>
         <!-- User stats (artisan/client) -->
         <div class="summary-box">
@@ -385,7 +392,7 @@ $stmt_orders->close();
           </div>
           <div class="decoration-shape"></div>
         </div>
-      <?php } ?>
+
     </section>
 
     <div class="dashboard-grid">
@@ -474,6 +481,7 @@ $stmt_orders->close();
         <p style="padding: 10px;">No upcoming bookings yet.</p>
     <?php endif; ?>
 </section>
+<?php } ?>
 
     </div>
   </main>

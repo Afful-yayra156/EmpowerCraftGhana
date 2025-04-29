@@ -1,160 +1,273 @@
+<?php
+// Database connection
+include('../db/config.php');
+// Fetch categories
+// Fetch categories from `services` table
+$categoryResult = $conn->query("SELECT DISTINCT category FROM services WHERE category IS NOT NULL AND category != ''");
+
+// Fetch names (users who submitted reviews or available users)
+$nameResult = $conn->query("SELECT DISTINCT CONCAT(first_name, ' ', last_name) AS full_name FROM users");
+
+// Fetch references (services)
+$referenceResult = $conn->query("SELECT service_id, title FROM services");
+
+// Fetch reviews (for review list section)
+$reviewResult = $conn->query("SELECT r.rating, r.comment, u.first_name, u.last_name, r.creation_date, s.title 
+                              FROM reviews r 
+                              JOIN users u ON r.reviewer_id = u.user_id 
+                              JOIN services s ON r.review_id = s.service_id 
+                              ORDER BY r.creation_date DESC");
+
+
+
+$categoryFilter = isset($_GET['category']) ? $_GET['category'] : '';
+$nameFilter = isset($_GET['name']) ? $_GET['name'] : '';
+
+$query = "SELECT r.rating, r.comment, u.first_name, u.last_name, r.creation_date, s.title
+          FROM reviews r
+          JOIN users u ON r.reviewer_id = u.user_id
+          JOIN services s ON r.review_id = s.service_id
+          WHERE 1=1";
+
+if ($categoryFilter) {
+    $query .= " AND s.category LIKE '%" . $conn->real_escape_string($categoryFilter) . "%'";
+}
+
+if ($nameFilter) {
+    $query .= " AND CONCAT(u.first_name, ' ', u.last_name) LIKE '%" . $conn->real_escape_string($nameFilter) . "%'";
+}
+
+$query .= " ORDER BY r.creation_date DESC";
+
+$reviewResult = $conn->query($query);
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reviews & Ratings | EmpowerSkills Ghana</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(to right, #4CAF50, #087F23);
-            color: white;
-            text-align: center;
-        }
-        .container {
-            width: 90%;
-            max-width: 800px;
-            margin: auto;
-            padding: 20px;
-            background: white;
-            color: black;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
-            margin-top: 50px;
-        }
-        h2 {
-            color: #087F23;
-        }
-        .review-box {
-            margin-top: 20px;
-            padding: 15px;
-            border-bottom: 1px solid #ccc;
-            text-align: left;
-        }
-        .review-box strong {
-            color: #087F23;
-        }
-        .rating {
-            color: gold;
-        }
-        .review-form {
-            margin-top: 20px;
-            padding: 10px;
-            background: #f9f9f9;
-            border-radius: 5px;
-            text-align: left;
-        }
-        textarea, select, button, input {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        button {
-            background: #087F23;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        button:hover {
-            background: #1B5E20;
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/reviews.css">
 </head>
 <body>
+    <section class="content">
+        <!-- Left Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <div class="logo-icon"><i class="fas fa-paint-brush"></i></div>
+                <h2>EmpowerCraft</h2>
+            </div>
+            <nav>
+                <a href="dashboard.php" class="nav-item"><i class="fas fa-home"></i><span class="nav-text">Dashboard</span></a>
+                <a href="profile.php" class="nav-item"><i class="fas fa-user"></i><span class="nav-text">My Profile</span></a>
+                <a href="messages.php" class="nav-item"><i class="fas fa-envelope"></i><span class="nav-text">Messages</span></a>
+                <a href="reviews.php" class="nav-item active"><i class="fas fa-star"></i><span class="nav-text">Reviews</span></a>
+                <a href="services.php" class="nav-item"><i class="fas fa-shopping-cart"></i><span class="nav-text">Services</span></a>
+                <a href="orders.php" class="nav-item"><i class="fas fa-shopping-cart"></i><span class="nav-text">Orders</span></a>
+                <a href="analytics.php" class="nav-item"><i class="fas fa-chart-line"></i><span class="nav-text">Analytics</span></a>
+                <a href="logout.php" class="nav-item"><i class="fas fa-sign-out-alt"></i><span class="nav-text">Logout</span></a>
+            </nav>
+        </aside>
 
-<div class="container">
-    <h2>Reviews & Ratings</h2>
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <h1>Reviews & Ratings</h1>
 
-    <!-- Reviews Section -->
-    <div id="reviewsSection">
-        <!-- Reviews will be dynamically loaded here -->
-    </div>
+            <!-- Reviews List -->
+            
+            <section class="reviews-list">
+                <?php while ($review = $reviewResult->fetch_assoc()): ?>
+                    <div class="review-item">
+                    <section class="reviews-list">
+                        <h3><?php echo htmlspecialchars($review['title']); ?></h3>
+                        <div class="review-rating">
+                            <?php for ($i = 0; $i < $review['rating']; $i++): ?>
+                                ⭐
+                            <?php endfor; ?>
+                        </div>
+                        <p class="review-author">By: <?php echo htmlspecialchars($review['first_name'] . ' ' . $review['last_name']); ?></p>
+                        <p class="review-date">Posted on: <?php echo date('F j, Y', strtotime($review['creation_date'])); ?></p>
+                        <p class="review-text"><?php echo htmlspecialchars($review['comment']); ?></p>
+                    </section>
+                    </div>
+                <?php endwhile; ?>
+            </section>
+        </main>
 
-    <!-- Add a Review Form -->
-    <div class="review-form">
-        <h3>Leave a Review</h3>
-        <select id="reviewType">
-            <option value="service">Service</option>
-            <option value="checkout">checkout</option>
-            <option value="user">User</option>
-        </select>
-        <input type="text" id="reviewerName" placeholder="Your Name">
-        <select id="rating">
-            <option value="5">★★★★★ - Excellent</option>
-            <option value="4">★★★★☆ - Very Good</option>
-            <option value="3">★★★☆☆ - Average</option>
-            <option value="2">★★☆☆☆ - Poor</option>
-            <option value="1">★☆☆☆☆ - Terrible</option>
-        </select>
-        <textarea id="reviewText" placeholder="Write your review..."></textarea>
-        <button onclick="submitReview()">Submit Review</button>
-    </div>
-</div>
+        <!-- Right Sidebar -->
+        <aside class="right-sidebar">
+            <!-- Search Bar -->
+            <div class="search-bar">
+                <input type="text" id="searchReview" placeholder="Search Reviews or Users...">
+            </div>
 
-<script>
-// Load existing reviews from the database when the page loads
-window.onload = function() {
-    loadReviews();
-};
+            <!-- Filter by Name -->
+            <div class="filter-name">
+                <label for="nameFilter">Filter by Name:</label>
+                <select id="nameFilter">
+                    <option value="">Select a Name</option>
+                    <?php while ($name = $nameResult->fetch_assoc()): ?>
+                        <option value="<?php echo htmlspecialchars($name['full_name']); ?>"><?php echo htmlspecialchars($name['full_name']); ?></option>
+                    <?php endwhile; ?>
+                </select>
+            </div>
 
-function loadReviews() {
-    let xhr = new XMLHttpRequest();
-    xhr.open("GET", "load_reviews.php", true);
-    xhr.onload = function() {
-        if (xhr.status === 200) {
-            let reviews = JSON.parse(xhr.responseText);
-            let reviewsSection = document.getElementById("reviewsSection");
-            reviews.forEach(review => {
-                let newReview = document.createElement("div");
-                newReview.classList.add("review-box");
-                newReview.innerHTML = `<strong>${review.reviewer_name}</strong> 
-                                       <span class="rating">${"★".repeat(review.rating)}${"☆".repeat(5 - review.rating)}</span>
-                                       <p>${review.comment}</p>`;
-                reviewsSection.appendChild(newReview);
-            });
-        }
-    };
-    xhr.send();
-}
+            <!-- Filter by Category -->
+            <div class="filter-category">
+                <label for="categoryFilter">Filter by Category:</label>
+                <select id="categoryFilter">
+                    <option value="">Select a Category</option>
+                    <?php while ($category = $categoryResult->fetch_assoc()): ?>
+                        <option value="<?php echo htmlspecialchars($category['category']); ?>"><?php echo htmlspecialchars($category['category']); ?></option>
+                    <?php endwhile; ?>
+                </select>
+            </div>
 
-function submitReview() {
-    let name = document.getElementById("reviewerName").value.trim();
-    let rating = document.getElementById("rating").value;
-    let reviewText = document.getElementById("reviewText").value.trim();
-    let reviewType = document.getElementById("reviewType").value;
+            <!-- Review Submission Form -->
+            <div class="review-form">
+                <h3>Submit a Review</h3>
+                <form action="../actions/submit_review.php" method="POST">
+                    <div class="form-group">
+                        <label for="rating">Rating:</label>
+                        <select id="rating" name="rating" required>
+                            <option value="">Select Rating</option>
+                            <option value="1">1 Star</option>
+                            <option value="2">2 Stars</option>
+                            <option value="3">3 Stars</option>
+                            <option value="4">4 Stars</option>
+                            <option value="5">5 Stars</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="comment">Comment:</label>
+                        <textarea id="comment" name="comment" rows="4" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="reference">Review for (Service/Person):</label>
+                        <select id="reference" name="reference" required>
+                            <option value="">Select a Service</option>
+                            <?php while ($reference = $referenceResult->fetch_assoc()): ?>
+                                <option value="<?php echo htmlspecialchars($reference['title']); ?>"><?php echo htmlspecialchars($reference['title']); ?></option>
+                            <?php endwhile; ?>
+                        </select>
+                    </div>
+                    <button type="submit">Submit Review</button>
+                </form>
+            </div>
+        </aside>
+    </section>
 
-    if (name === "" || reviewText === "") {
-        alert("Please fill out all fields before submitting.");
-        return;
+    <script>
+
+document.addEventListener("DOMContentLoaded", function() {
+    const searchInput = document.getElementById('searchReview');
+    const categoryFilter = document.getElementById('categoryFilter');
+    const nameFilter = document.getElementById('nameFilter');
+    const reviews = document.querySelectorAll('.review-item');
+
+    // Function to filter reviews
+    function filterReviews() {
+        const category = categoryFilter.value.toLowerCase();
+        const name = nameFilter.value.toLowerCase();
+
+        reviews.forEach(review => {
+            const reviewCategory = review.getAttribute('data-category').toLowerCase();
+            const reviewName = review.getAttribute('data-name').toLowerCase();
+
+            // Check if review matches selected filters
+            const matchesCategory = category ? reviewCategory.includes(category) : true;
+            const matchesName = name ? reviewName.includes(name) : true;
+
+            if (matchesCategory && matchesName) {
+                review.style.display = 'block';
+            } else {
+                review.style.display = 'none';
+            }
+        });
     }
 
-    let formData = new FormData();
-    formData.append('reviewer_name', name);
-    formData.append('rating', rating);
-    formData.append('reviewType', reviewType);
-    formData.append('reviewText', reviewText);
+    // Listen for filter changes
+    categoryFilter.addEventListener('change', filterReviews);
+    nameFilter.addEventListener('change', filterReviews);
 
-    let xhr = new XMLHttpRequest();
-    xhr.open("POST", "submit_review.php", true);
-    xhr.onload = function () {
-        if (xhr.status == 200) {
-            if (xhr.responseText.includes("successfully")) {
-                loadReviews();  // Reload reviews after successful submission
-                document.getElementById("reviewerName").value = "";
-                document.getElementById("rating").value = "5";
-                document.getElementById("reviewText").value = "";
+    // Optional: Implement search functionality for instant filtering
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        reviews.forEach(review => {
+            const reviewText = review.textContent.toLowerCase();
+            if (reviewText.includes(searchTerm)) {
+                review.style.display = 'block';
             } else {
-                alert("Error: " + xhr.responseText);
+                review.style.display = 'none';
             }
-        } else {
-            alert("Server error. Please try again later.");
-        }
-    };
-    xhr.send(formData);
-}
-</script>
+        });
+    });
+});
 
+        document.addEventListener("DOMContentLoaded", function() {
+            const searchInput = document.getElementById('searchReview');
+            searchInput.addEventListener('input', function() {
+                console.log("Searching for:", this.value);
+                // You can implement JavaScript filtering of the reviews here if you want instant search
+            });
+
+            document.getElementById('categoryFilter').addEventListener('change', function() {
+                console.log("Category filter selected:", this.value);
+            });
+
+            document.getElementById('nameFilter').addEventListener('change', function() {
+                console.log("Name filter selected:", this.value);
+            });
+        });
+
+
+        document.addEventListener("DOMContentLoaded", function() {
+    const searchInput = document.getElementById('searchReview');
+    const categoryFilter = document.getElementById('categoryFilter');
+    const nameFilter = document.getElementById('nameFilter');
+    const reviews = document.querySelectorAll('.review-item');
+
+    // Function to filter reviews
+    function filterReviews() {
+        const category = categoryFilter.value.toLowerCase();
+        const name = nameFilter.value.toLowerCase();
+
+        reviews.forEach(review => {
+            const reviewCategory = review.getAttribute('data-category').toLowerCase();
+            const reviewName = review.getAttribute('data-name').toLowerCase();
+
+            // Check if review matches selected filters
+            const matchesCategory = category ? reviewCategory.includes(category) : true;
+            const matchesName = name ? reviewName.includes(name) : true;
+
+            if (matchesCategory && matchesName) {
+                review.style.display = 'block';
+            } else {
+                review.style.display = 'none';
+            }
+        });
+    }
+
+    // Listen for filter changes
+    categoryFilter.addEventListener('change', filterReviews);
+    nameFilter.addEventListener('change', filterReviews);
+
+    // Optional: Implement search functionality for instant filtering
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        reviews.forEach(review => {
+            const reviewText = review.textContent.toLowerCase();
+            if (reviewText.includes(searchTerm)) {
+                review.style.display = 'block';
+            } else {
+                review.style.display = 'none';
+            }
+        });
+    });
+});
+
+    </script>
 </body>
 </html>

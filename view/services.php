@@ -216,7 +216,7 @@ include '../assets/functions/service_functions.php'; // Optional: if functions a
             });
         }
 
-        function addToCart(serviceId) {
+function addToCart(serviceId) {
     // Show loading indicator or disable the button
     const button = event.target;
     const originalText = button.innerHTML;
