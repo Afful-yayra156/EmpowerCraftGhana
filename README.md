@@ -29,3 +29,29 @@ Guided by Agile Software Development principles, we embrace flexibility, continu
 Despite Ghana's rich pool of talented artisans and professionals, there is no comprehensive digital platform that connects them with clients while offering skill development resources. Many skilled individuals struggle to monetize their abilities due to the lack of digital visibility, which leads to unemployment and economic stagnation.
 
 Empower Craft Ghana seeks to address this challenge by providing an integrated solution for showcasing, selling, and developing skills.
+
+# Objectives
+Empower Craft Ghana aims to:
+
+* Create an avenue for artisans and professionals to showcase their skills and services.
+* Connect skilled individuals with clients who need their expertise.
+* Provide access to affordable and relevant skill development opportunities.
+* Promote economic empowerment and self-employment through digital exposure.
+* Reduce the unemployment gap by enhancing market accessibility for skilled individuals.
+
+
+# Features
+* User Profiles for artisans, professionals, and clients
+* Order Management with real-time updates
+* Bookings services and adding it to the cart
+* Client Reviews and Ratings for service credibility
+* Secure User Authentication and Authorisation
+* Mobile-Friendly Design for wider reach and accessibility
+
+Technology Stack
+* Frontend: HTML, CSS, JavaScript
+* Backend: PHP
+* Database: Mysql
+* Version Control: Git & GitHub
+* Project Management: Agile (Scrum methodology)
+
