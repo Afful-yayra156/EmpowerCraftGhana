@@ -100,10 +100,7 @@ $result = $stmt->get_result();
         <i class="fas fa-user"></i>
         <span class="nav-text">My Profile</span>
       </a>
-      <a href="messages.php" class="nav-item">
-        <i class="fas fa-envelope"></i>
-        <span class="nav-text">Messages</span>
-      </a>
+
       <a href="reviews.php" class="nav-item">
         <i class="fas fa-star"></i>
         <span class="nav-text">Reviews</span>
@@ -122,6 +119,11 @@ $result = $stmt->get_result();
           <span class="nav-text">Analytics</span>
         </a>
       <?php endif; ?>
+
+      <a href="messages.php" class="nav-item">
+        <i class="fas fa-envelope"></i>
+        <span class="nav-text">Messages</span>
+      </a>
 
       <a href="logout.php" class="nav-item">
         <i class="fas fa-sign-out-alt"></i>

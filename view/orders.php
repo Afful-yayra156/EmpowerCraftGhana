@@ -13,12 +13,13 @@ if (!isset($_SESSION['user_id'])) {
 $buyer_id = $_SESSION['user_id'];
 $sql = "SELECT o.order_id, o.order_date, o.total_amount, o.status, o.shipping_address,
        o.shipping_method, o.tracking_number, o.notes,
-       s.title as service_name, s.price as service_price
+       s.title as service_name, s.price as service_price,
+       u.first_name, u.last_name, u.bio, u.profile_picture
 FROM orders o
 LEFT JOIN services s ON o.service_id = s.service_id
+LEFT JOIN users u ON s.user_id = u.user_id
 WHERE o.buyer_id = ?
 ORDER BY o.order_date DESC";
-
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $buyer_id);
 $stmt->execute();
@@ -280,16 +281,28 @@ $stmt->close();
          // Function to view order details
          function viewOrderDetails(orderId) {
             const order = orders.find(o => o.order_id === orderId);
+            if (!order) return;
+
+            const sellerName = `${order.first_name} ${order.last_name}`;
+            const bio = order.bio || "No bio available.";
+            const profileImage = order.profile_image;
+
             modalContent.innerHTML = `
-                <h4>Order #${order.order_id}</h4>
-                <p><strong>Service:</strong> ${order.service_name}</p>
+                <h4>Service: ${order.service_name}</h4>
+                <p><strong>Order ID:</strong> ${order.order_id}</p>
                 <p><strong>Status:</strong> ${order.status}</p>
                 <p><strong>Total:</strong> GHS ${parseFloat(order.total_amount).toFixed(2)}</p>
-                <p><strong>Payment Method:</strong> ${order.notes || "Not specified"}</p>
-            
-                <p><strong>Notes:</strong> ${order.notes || "No additional notes"}</p>
+                <hr>
+                <div class="seller-info">
+                    <img src="${profileImage}" alt="Seller profile" class="seller-profile">
+                    <div>
+                        <p><strong>Offered By:</strong> ${sellerName}</p>
+                        <p><strong>Bio:</strong> ${bio}</p>
+                    </div>
+                </div>
             `;
-            document.getElementById('orderModal').style.display = "block";
+
+            document.getElementById("orderModal").style.display = "block";
         }
         
         // Close modal

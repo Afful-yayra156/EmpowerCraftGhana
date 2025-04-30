@@ -46,7 +46,7 @@
                         session_start();
                         if (isset($_SESSION['login_error'])) {
                             echo '<span id="passwordError" style="color: red;">' . $_SESSION['login_error'] . '</span>';
-                            unset($_SESSION['login_error']); // Clear the error after showing it
+                            unset($_SESSION['login_error']); 
                         }
                         ?>
                     </div>
@@ -126,12 +126,12 @@
                 errorMessages.push("Password must contain at least one special character!");
             }
 
-            // Display errors and prevent form submission if invalid
+
             if (errorMessages.length > 0) {
                 passwordError.innerHTML = errorMessages.join("<br>");
                 return false;
             } else {
-                return true; // Proceed with form submission if valid
+                return true; 
             }
         }
     </script>

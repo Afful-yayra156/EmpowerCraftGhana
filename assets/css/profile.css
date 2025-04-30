@@ -8,7 +8,7 @@
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     display: flex;
     min-height: 100vh;
-    background: linear-gradient(135deg, #d5ebff, #89f28c);
+    background: linear-gradient(135deg, #d5ebff, #a3e8a6);
     position: relative;
     overflow-x: hidden;
   }

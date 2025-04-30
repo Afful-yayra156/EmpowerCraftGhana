@@ -59,11 +59,13 @@ $reviewResult = $conn->query($query);
             <nav>
                 <a href="dashboard.php" class="nav-item"><i class="fas fa-home"></i><span class="nav-text">Dashboard</span></a>
                 <a href="profile.php" class="nav-item"><i class="fas fa-user"></i><span class="nav-text">My Profile</span></a>
-                <a href="messages.php" class="nav-item"><i class="fas fa-envelope"></i><span class="nav-text">Messages</span></a>
                 <a href="reviews.php" class="nav-item active"><i class="fas fa-star"></i><span class="nav-text">Reviews</span></a>
                 <a href="services.php" class="nav-item"><i class="fas fa-shopping-cart"></i><span class="nav-text">Services</span></a>
                 <a href="orders.php" class="nav-item"><i class="fas fa-shopping-cart"></i><span class="nav-text">Orders</span></a>
+                <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
                 <a href="analytics.php" class="nav-item"><i class="fas fa-chart-line"></i><span class="nav-text">Analytics</span></a>
+                <?php endif; ?>
+                <a href="messages.php" class="nav-item"><i class="fas fa-envelope"></i><span class="nav-text">Messages</span></a>
                 <a href="logout.php" class="nav-item"><i class="fas fa-sign-out-alt"></i><span class="nav-text">Logout</span></a>
             </nav>
         </aside>

@@ -1,9 +1,8 @@
 <?php
-// Include the database configuration file to establish a connection
+
 include '../db/config.php';
 global $conn;
 
-// Enable error reporting for debugging (disable in production)
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 

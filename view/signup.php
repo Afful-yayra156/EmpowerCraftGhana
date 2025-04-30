@@ -127,12 +127,12 @@
                 <p>1 University Avenue, Accra, Ghana</p>
                 <p>Email: empowerCraft@gmail.com</p>
                 <p>Phone: +233 50 65 25 001</p>
-                <!-- <div class="social-media">
+                <div class="social-media">
                     <a href="#"><i class="fab fa-facebook-f"></i></a>
                     <a href="#"><i class="fab fa-twitter"></i></a>
                     <a href="#"><i class="fab fa-instagram"></i></a>
                     <a href="#"><i class="fab fa-linkedin-in"></i></a>
-                </div> -->
+                </div>
             </div>
         </div>
         <div class="copyright">
@@ -180,7 +180,7 @@
         errorMessages.push("Passwords do not match.");
     }
 
-    // Display errors or allow submission
+
     if (errorMessages.length > 0) {
         passwordError.innerHTML = errorMessages.join("<br>");
         return false; // Prevent form submission if errors exist

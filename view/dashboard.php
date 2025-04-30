@@ -49,17 +49,20 @@ if ($userRole == 'admin') {
         $total_services = $row_services['total_services'];
     }
     
+
     // Get total bookings
-    $sql_orders = "SELECT COUNT(DISTINCT buyer_id) AS total_bookings FROM orders WHERE service_id = ? AND status = 'cart'";
+    $sql_orders = "SELECT COUNT(*) AS total_orders FROM orders";
     $stmt_orders = $conn->prepare($sql_orders);
-    $stmt_orders->bind_param("i", $service_id); // Assuming you're looking for a specific service
     $stmt_orders->execute();
     $result_orders = $stmt_orders->get_result();
     
     if ($result_orders && $row_orders = $result_orders->fetch_assoc()) {
-        $totalCartAdditions = $row_orders['total_bookings'];
+        $totalCartAdditions = $row_orders['total_orders'];
+    } else {
+        $totalCartAdditions = 0;
     }
     
+
     
     // Get total reviews
     $sql_reviews = "SELECT COUNT(*) AS total_reviews FROM reviews";
@@ -198,10 +201,7 @@ $stmt_orders->close();
         <i class="fas fa-user"></i>
         <span class="nav-text">My Profile</span>
       </a>
-      <a href="messages.php" class="nav-item">
-        <i class="fas fa-envelope"></i>
-        <span class="nav-text">Messages</span>
-      </a>
+
       <a href="reviews.php" class="nav-item">
         <i class="fas fa-star"></i>
         <span class="nav-text">Reviews</span>
@@ -221,6 +221,11 @@ $stmt_orders->close();
           <span class="nav-text">Analytics</span>
         </a>
       <?php endif; ?>
+
+      <a href="messages.php" class="nav-item">
+        <i class="fas fa-envelope"></i>
+        <span class="nav-text">Messages</span>
+      </a>
 
       <a href="logout.php" class="nav-item">
         <i class="fas fa-sign-out-alt"></i>
@@ -264,16 +269,16 @@ $stmt_orders->close();
           <p><?php echo $total_services; ?></p>
           <div class="trend">
             <i class="fas fa-arrow-up"></i> 
-            <span>+3 this month</span>
+            <span>At your service</span>
           </div>
           <div class="decoration-shape"></div>
         </div>
         <div class="summary-box">
-          <h3><i class="fas fa-calendar-check"></i> Bookings</h3>
-          <p><?php echo $totalBookings; ?></p>
+          <h3><i class="fas fa-calendar-check"></i> Total Bookings</h3>
+          <p><?php echo $totalCartAdditions; ?></p>
           <div class="trend">
             <i class="fas fa-arrow-up"></i> 
-            <span>+2 this week</span>
+            <span>People ordering</span>
           </div>
           <div class="decoration-shape"></div>
         </div>
@@ -282,7 +287,7 @@ $stmt_orders->close();
           <p><?php echo $totalReviews; ?></p>
           <div class="trend">
             <i class="fas fa-arrow-up"></i> 
-            <span>98% positive</span>
+            <span>Rates</span>
           </div>
           <div class="decoration-shape"></div>
         </div>
@@ -293,7 +298,7 @@ $stmt_orders->close();
   <section class="messages-section">
     <div class="section-header">
       <h2>Recent Messages</h2>
-      <a href="messages.php">View all</a>
+      <a href="Allmessages.php">View all</a>
     </div>
     
     <?php if (!empty($recent_contacts)): ?>

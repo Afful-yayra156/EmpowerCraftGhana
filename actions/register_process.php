@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $password = trim($_POST['password']);
     $confirm_password = trim($_POST['confirm_password']);
     $role = trim($_POST['userType']);
-    $phone_number = isset($_POST['phone_number']) ? trim($_POST['phone_number']) : null;
+    $phone_number = isset($_POST['phone']) ? trim($_POST['phone']) : null;
 
     if (empty($fname) || empty($lname) || empty($email) || empty($password) || empty($confirm_password) || empty($role)) {
         die('Please fill in all required fields.');
@@ -39,8 +39,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } else {
         $hashed_password = password_hash($password, PASSWORD_BCRYPT);
 
-        $sql = "INSERT INTO users (first_name, last_name, email, password_hash, user_type, phone_number, registration_date) 
-                VALUES (?, ?, ?, ?, ?, ?, NOW())";
+
+        $sql = "INSERT INTO users (first_name, last_name, email, password_hash, user_type, phone_number, registration_date, bio, location) 
+                VALUES (?, ?, ?, ?, ?, ?, NOW(), 'This is my bio.', 'Not specified')";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param('ssssss', $fname, $lname, $email, $hashed_password, $role, $phone_number);
 
