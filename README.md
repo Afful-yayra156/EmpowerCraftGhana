@@ -48,7 +48,7 @@ Empower Craft Ghana aims to:
 * Secure User Authentication and Authorisation
 * Mobile-Friendly Design for wider reach and accessibility
 
-Technology Stack
+# Technology Stack
 * Frontend: HTML, CSS, JavaScript
 * Backend: PHP
 * Database: Mysql
