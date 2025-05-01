@@ -55,3 +55,40 @@ Empower Craft Ghana aims to:
 * Version Control: Git & GitHub
 * Project Management: Agile (Scrum methodology)
 
+# Setup
+To set up Empower Craft Ghana on your local machine or server:
+* Clone the repository
+  git clone https://github.com/yourusername/empower-craft-ghana.git
+  cd empower-craft-ghana
+* Import the provided .sql file from our github repo into your local MySQL server using phpMyAdmin 
+  or MySQL CLI.
+  Configure your database connection in /db/config.php:
+  $conn = new mysqli('localhost', 'username', 'password', 'database_name');
+   Use a local server like XAMPP
+  Place the project folder in your htdocs or web root directory.
+  Start Apache and MySQL services.
+  Access the platform at:
+  http://localhost/empower-craft-ghana
+
+# Usage
+* Register as a user (artisan, professional, or client).
+  * Login to access personalized dashboards.
+  * Artisans/Professionals can:
+  * Add and manage services or products.
+  * Receive orders and bookings.
+  * View and respond to client reviews.
+
+* Clients can:
+  * Browse service providers.
+  * Book or order services.
+  * Rate and review completed services.
+* Admin Panel  manages users and services.
+
+# Purpose 
+* Connect artisans and professionals with clients online.
+* Digitally showcase and sell skills and services.
+* Provide skill development opportunities.
+* Tackle unemployment and boost self-employment in Ghana.
+* Support economic growth through tech-driven empowerment.
+
+
