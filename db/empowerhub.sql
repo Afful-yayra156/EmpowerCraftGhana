@@ -23,6 +23,94 @@ SET time_zone = "+00:00";
 
 -- --------------------------------------------------------
 
+
+--contact messages
+CREATE TABLE contact_messages (
+  id int(11) NOT NULL,
+  first_name varchar(255) NOT NULL,
+  last_name varchar(255) NOT NULL,
+  email varchar(255) NOT NULL,
+  phone_number varchar(20) NOT NULL,
+  category varchar(255) NOT NULL,
+  artisan varchar(255) NOT NULL,
+  message text NOT NULL,
+  submitted_at timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+
+--orders
+CREATE TABLE orders (
+  order_id int(11) NOT NULL,
+  buyer_id int(11) NOT NULL,
+  order_date timestamp NOT NULL DEFAULT current_timestamp(),
+  total_amount decimal(10,2) NOT NULL,
+  status enum('cart','pending','processing','shipped','delivered','cancelled') DEFAULT 'pending',
+  shipping_address text DEFAULT NULL,
+  shipping_method varchar(100) DEFAULT NULL,
+  tracking_number varchar(100) DEFAULT NULL,
+  notes text DEFAULT NULL,
+  service_id int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+
+--reviews
+CREATE TABLE reviews (
+  review_id int(11) NOT NULL,
+  reviewer_id int(11) NOT NULL,
+  reviewed_id int(11) NOT NULL,
+  reference_type enum('service','listing','user') NOT NULL,
+  reference_id int(11) NOT NULL,
+  rating decimal(3,2) NOT NULL CHECK (rating >= 1 and rating <= 5),
+  comment text DEFAULT NULL,
+  creation_date timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+
+--services
+CREATE TABLE services (
+  service_id int(11) NOT NULL,
+  user_id int(11) NOT NULL,
+  category_id int(11) NOT NULL,
+  title varchar(100) NOT NULL,
+  description text NOT NULL,
+  price decimal(10,2) NOT NULL,
+  category varchar(255) DEFAULT NULL,
+  duration varchar(50) DEFAULT NULL,
+  availability text DEFAULT NULL,
+  is_featured tinyint(1) DEFAULT 0,
+  creation_date timestamp NOT NULL DEFAULT current_timestamp(),
+  last_updated timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  status enum('active','inactive','pending_approval') DEFAULT 'pending_approval',
+  image_path varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+
+--users
+CREATE TABLE users (
+  user_id int(11) NOT NULL,
+  email varchar(100) NOT NULL,
+  phone_number varchar(15) DEFAULT NULL,
+  password_hash varchar(255) NOT NULL,
+  user_type enum('artisan','client','admin','account_manager') NOT NULL,
+  first_name varchar(50) NOT NULL,
+  last_name varchar(50) NOT NULL,
+  profile_picture varchar(255) DEFAULT NULL,
+  bio text DEFAULT NULL,
+  location varchar(100) DEFAULT NULL,
+  registration_date timestamp NOT NULL DEFAULT current_timestamp(),
+  last_login timestamp NULL DEFAULT NULL,
+  is_verified tinyint(1) DEFAULT 0,
+  account_status enum('active','suspended','inactive') DEFAULT 'active',
+  average_rating decimal(3,2) DEFAULT 0.00
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+
+
 --
 -- Table structure for table `bookings`
 --
@@ -135,25 +223,7 @@ CREATE TABLE `notifications` (
   `creation_date` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- --------------------------------------------------------
 
---
--- Table structure for table `orders`
---
-
-CREATE TABLE `orders` (
-  `order_id` int(11) NOT NULL,
-  `buyer_id` int(11) NOT NULL,
-  `order_date` timestamp NOT NULL DEFAULT current_timestamp(),
-  `total_amount` decimal(10,2) NOT NULL,
-  `status` enum('pending','processing','shipped','delivered','cancelled') DEFAULT 'pending',
-  `shipping_address` text DEFAULT NULL,
-  `shipping_method` varchar(100) DEFAULT NULL,
-  `tracking_number` varchar(100) DEFAULT NULL,
-  `notes` text DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
 
 --
 -- Table structure for table `order_items`
@@ -189,24 +259,7 @@ CREATE TABLE `payments` (
   `payment_date` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- --------------------------------------------------------
 
---
--- Table structure for table `reviews`
---
-
-CREATE TABLE `reviews` (
-  `review_id` int(11) NOT NULL,
-  `reviewer_id` int(11) NOT NULL,
-  `reviewed_id` int(11) NOT NULL,
-  `reference_type` enum('service','checkout','user') NOT NULL,
-  `reference_id` int(11) NOT NULL,
-  `rating` decimal(3,2) NOT NULL CHECK (`rating` >= 1 and `rating` <= 5),
-  `comment` text DEFAULT NULL,
-  `creation_date` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
 
 --
 -- Table structure for table `services`
