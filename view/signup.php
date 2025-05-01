@@ -52,7 +52,7 @@
             <!-- Form Section -->
             <div class="form-section">
                 <h2>Create Your Account</h2>
-                <form id="signupForm" action="../actions/register_process.php" method="post" onsubmit="return validateForm()">
+                <form id="signupForm" action="../wwwroot/actions/register_process.php" method="post" onsubmit="return validateForm()">
                     <div class="form-row">
                         <input type="text" id="username" name = "firstname"placeholder="First Name" required>
                     </div>
